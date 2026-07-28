@@ -135,7 +135,7 @@ export function LoginForm() {
       </form>
 
       <p className="mt-auto pt-8 text-center text-xs text-muted">
-        演示账号 admin / admin123（管理员）· user / user123
+        演示账号 admin / admin123 · user / user123（各自独立菜单）
       </p>
     </div>
   );

@@ -41,4 +41,4 @@ import { ICON_SIZE } from "@/lib/constants/icon-size";
 | 关闭 | `X` |
 | 刷新 | `RefreshCw` |
 | 占位图 | `Image` / `ImageIcon` |
-| 登录标 | `UtensilsCrossed` |
+| 分类管理 | `FolderTree` |

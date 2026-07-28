@@ -8,9 +8,9 @@
 
 | 层级 | 机制 | 目标 |
 |------|------|------|
-| Next 数据缓存 | `unstable_cache` 包装菜单快照（分类 + 上架菜品），标签 **`menu`**，`revalidate` 建议 **300～3600s** | 降低点菜页读库 |
-| 同请求去重 | React `cache()` 包装 `requireUser()` / `requireAdmin()` | 同一次 RSC 内只解析一次会话 |
-| 路由 / 标签失效 | 菜品写操作、`revalidateTag('menu')` + 相关 `revalidatePath` | 管理端改菜后前台尽快一致 |
+| Next 数据缓存 | `unstable_cache` 菜单快照，**按 userId 分键**，标签 **`menu:{userId}`** | 降低读库且互不串号 |
+| 同请求去重 | React `cache()` 可包装 `requireUser()` | 同一次 RSC 内只解析一次会话 |
+| 路由 / 标签失效 | 菜品写操作 `revalidateTag(menu:{userId})` | 仅刷新本人菜单 |
 | 会话 | httpOnly Cookie（Auth session） | 服务端识别当前用户 |
 | 前端持久化 | localStorage：用户展示信息（昵称/头像/角色）；**不存密码** | 重启减少闪烁；以 Cookie 为准 |
 | 购物车 | 内存 `useState`；可选 `sessionStorage`（键如 `menu_cart`） | 刷新页可恢复未结算；**切换账号必须清空** |
@@ -22,7 +22,7 @@
 
 | 数据 | 缓存键要素 | 标签 | 失效时机 |
 |------|------------|------|----------|
-| 菜单快照 | 固定键如 `menu-snapshot`（全店一份） | `menu` | 创建/更新/删除菜品、改分类、上下架 |
+| 菜单快照 | 键含 `userId` | `menu:{userId}` | 本人创建/更新/删除菜品、登录/登出 |
 | 用户资料 | 一般不长缓存；按请求读 Cookie → profiles | — | 登录/登出 |
 | 订单列表 | 不建议长缓存（含 userId）；可仅 React `cache()` 同请求去重 | — | 下单后 `revalidatePath('/orders')` |
 

@@ -10,7 +10,7 @@ import {
   setSessionCookie,
   signSession,
 } from "@/lib/auth/session";
-import { MENU_CACHE_TAG } from "@/lib/constants/branding";
+import { menuCacheTag } from "@/lib/menu/defaults";
 import { createServiceClient } from "@/lib/supabase/service";
 import type { Profile } from "@/lib/types";
 
@@ -39,14 +39,6 @@ export async function requireUser(): Promise<Profile> {
     throw new Error("请先登录");
   }
   return sessionToProfile(session);
-}
-
-export async function requireAdmin(): Promise<Profile> {
-  const user = await requireUser();
-  if (user.role !== "admin") {
-    throw new Error("当前账号无管理权限");
-  }
-  return user;
 }
 
 export async function getCurrentUserAction(): Promise<Profile | null> {
@@ -92,13 +84,17 @@ export async function loginAction(input: {
   const user = mapProfile(row);
   const token = await signSession(user);
   await setSessionCookie(token);
+  revalidateTag(menuCacheTag(user.id), "max");
   revalidatePath("/", "layout");
   return { ok: true, user };
 }
 
 export async function logoutAction() {
+  const session = await readSession();
   await clearSessionCookie();
-  revalidateTag(MENU_CACHE_TAG, "max");
+  if (session) {
+    revalidateTag(menuCacheTag(session.sub), "max");
+  }
   revalidatePath("/", "layout");
   redirect("/login");
 }
@@ -107,8 +103,18 @@ export async function logoutAction() {
 export async function ensureSeedPasswordsAction(): Promise<string> {
   const supabase = createServiceClient();
   const seeds = [
-    { account: "admin", password: "admin123", nickname: "店长", role: "admin" as const },
-    { account: "user", password: "user123", nickname: "食客小明", role: "user" as const },
+    {
+      account: "admin",
+      password: "admin123",
+      nickname: "店长",
+      role: "user" as const,
+    },
+    {
+      account: "user",
+      password: "user123",
+      nickname: "食客小明",
+      role: "user" as const,
+    },
   ];
 
   for (const seed of seeds) {

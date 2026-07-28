@@ -55,7 +55,7 @@ export function ManageClient({
       <header className="sticky top-0 z-10 flex items-center justify-between border-b border-line bg-[#fffaf2]/95 px-4 py-3 pt-[max(0.75rem,env(safe-area-inset-top))] backdrop-blur">
         <div className="flex items-center gap-3">
           <BackLink href="/mine" />
-          <h1 className="font-display text-xl">点菜管理</h1>
+          <h1 className="font-display text-xl">我的菜单</h1>
         </div>
         {selected.size > 0 ? (
           <button

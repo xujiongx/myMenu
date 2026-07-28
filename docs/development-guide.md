@@ -103,26 +103,25 @@ npm run start
 
 1. **只改任务所需**：不做顺手大重构。
 2. **密钥边界**：上传与写库只在服务端；客户端只收图片 URL。
-3. **权限**：管理 Action 统一 `requireAdmin()`；UI 按 `role` 隐藏操作，服务端仍校验。
+3. **数据隔离**：分类 / 菜品 / 订单一律带当前 `user_id`；菜单缓存标签 `menu:{userId}`。
 4. **文档同步**：功能合并后更新 `docs/` 对应专篇，并在 `docs/change/` 记迭代。
 5. **Next 版本**：若仓库已安装 Next，编写前先查阅 `node_modules/next/dist/docs/` 中与当前版本相关的指南，注意破坏性变更。
 
 ## 7. UI / 交互要点（对齐 PRD）
 
-- 登录：居中简约，无多余模块；LOGO 使用 `UtensilsCrossed`（lucide）。
-- 点菜：左分类右列表（**滚动联动**）；点击菜品打开详情弹层；底栏购物车与 Tab 留白；底 Tab「点菜 / 我的」。
-- 我的：头像信息 + 列表入口。
-- 图标：统一 [lucide-react](https://lucide.dev/)，尺寸见 `lib/constants/icon-size.ts` 与 [icons.md](./icons.md)。
-- 加载 / 空态 / 错误重试文案与 [PRD.md](./PRD.md) §8 一致。
+- 登录：居中简约；LOGO 使用 `UtensilsCrossed`（lucide）。
+- 点菜：仅展示**本人**菜单；左右分类滚动联动；详情弹层。
+- 我的：点菜记录、**分类管理**、**我的菜单**、切换账号。
+- 图标：lucide-react，见 [icons.md](./icons.md)。
 
 ## 8. FAQ
 
 | 问题 | 建议 |
 |------|------|
-| 改菜后点菜页仍旧？ | 确认写操作调用了 `revalidateTag('menu')`；或下拉刷新 |
-| 上传失败？ | 检查 `IMG_BB_API_KEY`、文件大小/类型、服务端网络 |
-| 普通用户看到管理按钮？ | UI 按 role 隐藏；接口必须 403 |
-| 账号如何对接 Auth？ | 可用 `{account}@menu.local` 映射邮箱，或自定义 token 方案；实现时在 api.md 补最终方案 |
+| 改菜后点菜页仍旧？ | 确认写操作 `revalidateTag(menu:{userId})`；或点刷新 |
+| 切换账号后仍看到旧菜？ | 清购物车；菜单按用户分键缓存，登录会失效标签 |
+| 上传失败？ | 检查 `IMG_BB_API_KEY`、文件大小/类型 |
+| 两个演示账号菜不一样？ | 预期：admin 与 user 种子菜单相互独立 |
 
 ## 9. 相关文档
 

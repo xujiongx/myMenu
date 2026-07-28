@@ -54,9 +54,8 @@ flowchart TB
 ### 5.1 首次部署
 
 1. 在 Supabase SQL Editor 执行迁移（`supabase/migrations/*`，实现阶段提供）。
-2. 创建初始 admin 用户（Auth + `profiles.role = admin`）。
-3. 连接 Git，Framework 选 Next.js，配置 §3 变量后 Deploy。
-4. 验证：未登录跳转 `/login` → 登录 → 点菜 → 结算 → 我的记录；管理员上传菜品图。
+2. 执行迁移：新库用 `001_init.sql`；旧库追加 `002_per_user_menu.sql`。  
+3. 用演示账号验证：admin / user 菜单互不相同；均可进入「我的菜单」管理。
 
 ### 5.2 常规发布
 
@@ -79,8 +78,8 @@ flowchart TB
 | `/login` | 可打开 |
 | 错误密码 | 明确错误提示 |
 | 点菜结算 | 生成订单且金额正确 |
-| 非 admin 调管理接口 | 403 |
-| 上传接口无 Key | 失败有日志，不暴露 Key |
+| 非本人菜品 / 订单 | 不可见、不可改 |
+| 上传接口未登录 | 401 |
 
 ## 8. 监控与日志（建议）
 

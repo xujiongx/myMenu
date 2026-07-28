@@ -26,6 +26,7 @@ export async function createOrder(
     const { data: dishes, error } = await supabase
       .from("dishes")
       .select("id, name, image_url, price, status")
+      .eq("user_id", user.id)
       .in("id", dishIds);
 
     if (error) {
@@ -177,8 +178,8 @@ export async function fetchOrderDetail(
     throw new Error("加载订单失败");
   }
   if (!data) return null;
-  if (data.user_id !== user.id && user.role !== "admin") {
-    throw new Error("当前账号无管理权限");
+  if (data.user_id !== user.id) {
+    throw new Error("无权查看该订单");
   }
 
   const items = (

@@ -19,7 +19,8 @@ export function middleware(request: NextRequest) {
     pathname === "/" ||
     pathname.startsWith("/mine") ||
     pathname.startsWith("/orders") ||
-    pathname.startsWith("/manage");
+    pathname.startsWith("/manage") ||
+    pathname.startsWith("/categories");
 
   if (isProtected && !isLoggedIn) {
     const url = request.nextUrl.clone();
@@ -31,5 +32,12 @@ export function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/", "/login", "/mine", "/orders/:path*", "/manage/:path*"],
+  matcher: [
+    "/",
+    "/login",
+    "/mine",
+    "/orders/:path*",
+    "/manage/:path*",
+    "/categories/:path*",
+  ],
 };

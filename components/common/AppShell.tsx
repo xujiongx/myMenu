@@ -15,6 +15,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   const hideTab =
     pathname.startsWith("/login") ||
     pathname.startsWith("/manage") ||
+    pathname.startsWith("/categories") ||
     pathname.startsWith("/orders");
   const isOrderPage = pathname === "/";
 

@@ -11,7 +11,6 @@ export default async function DishEditPage({
 }) {
   const user = await getCurrentUserAction();
   if (!user) redirect("/login");
-  if (user.role !== "admin") redirect("/mine");
 
   const { id } = await searchParams;
   const menu = await fetchMenuSnapshot();

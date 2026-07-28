@@ -4,64 +4,59 @@
 
 ## 1. 概述
 
-- **数据库类型**：PostgreSQL（Supabase 托管）。
-- **身份**：自定义账号密码（`profiles.password_hash`，bcrypt），**不依赖** `auth.users`；会话由 Next.js 签发 httpOnly JWT Cookie。
-- **设计原则**：
-  - 订单明细与订单头分离；明细保存下单时名称/单价/图片快照。
-  - 菜品图片存 **ImgBB URL**（文本）。
-  - 业务读写经服务端 **Service Role** + 应用层鉴权；表已 ENABLE RLS 且无 anon 策略。
+- **多租户边界**：以 **登录用户 `profiles.id`** 隔离；每人只看见、管理自己的分类 / 菜品 / 订单。
+- **身份**：自定义账号密码（`profiles.password_hash`，bcrypt）+ JWT Cookie。
+- **菜品图**：ImgBB URL。
+- 业务经 Service Role + 应用层按 `user_id` 过滤。
 
-权威 DDL：[`supabase/migrations/001_init.sql`](../supabase/migrations/001_init.sql)。
+权威 DDL：[`supabase/migrations/001_init.sql`](../supabase/migrations/001_init.sql)  
+若库中仍是旧版全局菜单，再执行 [`002_per_user_menu.sql`](../supabase/migrations/002_per_user_menu.sql)。
 
 ## 2. ER 关系
 
 ```mermaid
 erDiagram
-  profiles ||--o{ dishes : manages
+  profiles ||--o{ categories : owns
+  profiles ||--o{ dishes : owns
   profiles ||--o{ orders : places
   categories ||--o{ dishes : contains
   orders ||--o{ order_items : has
   dishes ||--o{ order_items : referenced
 ```
 
-## 3. 表结构说明
+## 3. 表结构要点
 
-### 3.1 `profiles`
+### 3.1 `categories`
 
-| 字段 | 类型 | 约束 | 说明 |
-|------|------|------|------|
-| id | uuid | PK，default gen_random_uuid() | |
-| account | text | NOT NULL，UNIQUE，`^[A-Za-z0-9]+$` | 登录账号 |
-| password_hash | text | NOT NULL | bcrypt |
-| nickname | text | NOT NULL | 昵称 |
-| avatar_url | text | 可空 | 头像 |
-| role | text | `user` / `admin`，default `user` | 角色 |
-| created_at / updated_at | timestamptz | default now() | |
+| 字段 | 说明 |
+|------|------|
+| user_id | 所属用户，FK → profiles，CASCADE |
+| name | 与 user_id 联合唯一 |
 
-### 3.2 `categories` / `dishes` / `orders` / `order_items`
+### 3.2 `dishes`
 
-与初版设计一致：分类、菜品（含上下架）、订单头、订单明细快照。详见迁移 SQL。
+| 字段 | 说明 |
+|------|------|
+| user_id | 所属用户 |
+| category_id | 必须属于同一 user_id 的分类 |
+| 唯一 | `(user_id, category_id, name)` |
 
-**菜品唯一约束**：`(category_id, name)`。
+### 3.3 `orders` / `order_items`
 
-**索引**：`idx_dishes_category_status`、`idx_dishes_status_updated`、`idx_orders_user_created`、`idx_order_items_order`。
+订单按 `user_id` 隔离；明细保留下单快照。
 
-## 4. 行级安全（RLS）
+## 4. 种子账号
 
-全部业务表 ENABLE RLS，**不配置 anon 读写策略**。应用使用 `SUPABASE_SERVICE_ROLE_KEY` 在服务端访问，并在 Action 内校验登录态与 admin 角色。
-
-## 5. 种子数据
-
-| 账号 | 密码 | 角色 |
+| 账号 | 密码 | 说明 |
 |------|------|------|
-| admin | admin123 | 管理员 |
-| user | user123 | 普通用户 |
+| admin | admin123 | 独立菜单（演示菜品较全） |
+| user | user123 | 独立菜单（示例菜品不同） |
 
-另含 7 个分类与若干演示菜品。
+新用户无分类时，应用会调用 `ensureDefaultCategories` 自动写入默认分类。
 
-## 6. 变更记录
+## 5. 变更记录
 
 | 日期 | 说明 |
 |------|------|
-| 2026-07-28 | 初版设计 |
-| 2026-07-28 | 落地：自定义 password_hash，去掉 auth.users 依赖；迁移 `001_init.sql` |
+| 2026-07-28 | 初版 |
+| 2026-07-28 | **每用户独立菜单**：categories/dishes 增加 `user_id` |

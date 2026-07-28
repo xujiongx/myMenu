@@ -41,19 +41,26 @@ npm run dev
 
 打开 [http://localhost:3000](http://localhost:3000)。
 
-**演示账号**：`admin` / `admin123`（管理员）· `user` / `user123`（普通用户）
+**演示账号**：`admin` / `admin123` · `user` / `user123`（**各自独立菜单**）
 
 ## 路由
 
 | 路径 | 功能 |
 |------|------|
 | `/login` | 登录 |
-| `/` | 点菜 |
+| `/` | 点菜（本人菜单） |
 | `/mine` | 我的 |
 | `/orders` | 点菜记录 |
 | `/orders/[id]` | 订单详情 |
-| `/manage` | 菜品管理（admin） |
+| `/manage` | 我的菜单（菜品管理） |
 | `/manage/dish` | 新增/编辑菜品 |
+| `/categories` | 分类管理 |
+| `/categories/form` | 新增/编辑分类 |
+
+### 数据库
+
+- 新库：执行 `supabase/migrations/001_init.sql`
+- 已跑过旧版全局菜单：再执行 `002_per_user_menu.sql`
 
 ## 文档
 

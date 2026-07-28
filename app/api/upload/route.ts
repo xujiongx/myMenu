@@ -14,12 +14,6 @@ export async function POST(request: NextRequest) {
         { status: 401 },
       );
     }
-    if (session.role !== "admin") {
-      return NextResponse.json(
-        { code: 403, message: "当前账号无管理权限" },
-        { status: 403 },
-      );
-    }
 
     const apiKey = process.env.IMG_BB_API_KEY;
     if (!apiKey) {

@@ -1,46 +1,39 @@
 # 接口与数据访问说明
 
-> 数据访问由 **Next.js Server Actions** + Supabase **Service Role** 完成；图片上传为 `POST /api/upload`（ImgBB）。  
-> 更新日期：2026-07-28
+> 更新日期：2026-07-28（每用户独立菜单）
 
-## 1. 设计说明
+## 1. 隔离原则
 
-| 能力 | 实现方式 | 文件 |
-|------|----------|------|
-| 登录 / 登出 / 当前用户 | Server Actions | `app/actions/auth.ts` |
-| 菜单快照 / 刷新缓存 | Server Actions + `unstable_cache` | `app/actions/menu.ts` |
-| 下单 / 订单列表 / 详情 | Server Actions | `app/actions/order.ts` |
-| 菜品 CRUD | Server Actions（admin） | `app/actions/dish-admin.ts` |
-| 图片上传 | Route Handler | `app/api/upload/route.ts` |
-| 路由守卫 | middleware（Cookie 有无） | `middleware.ts` |
+所有菜单 / 菜品 / 订单读写均带当前登录用户 `user_id`；缓存标签为 `menu:{userId}`。
 
-会话 Cookie：`menu_session`（JWT，HS256，7 天）。购物车仅客户端 `sessionStorage`（`menu_cart`）。
+| 能力 | 文件 |
+|------|------|
+| 登录 / 登出 | `app/actions/auth.ts` |
+| 菜单快照（仅本人） | `app/actions/menu.ts` |
+| 菜品 CRUD（仅本人） | `app/actions/dish-admin.ts` |
+| 分类 CRUD（仅本人） | `app/actions/category.ts` |
+| 下单 / 订单（仅本人） | `app/actions/order.ts` |
+| 图片上传 | `app/api/upload/route.ts`（任意登录用户） |
 
-## 2. 会话
+## 2. 菜单
 
-- `loginAction({ account, password })` → 校验 bcrypt → 写 Cookie → 返回用户资料  
-- `logoutAction()` → 清 Cookie → 跳转 `/login`  
-- `getCurrentUserAction()` / `requireUser()` / `requireAdmin()`
+- `fetchMenuSnapshot()`：先 `ensureDefaultCategories`，再返回当前用户上架菜品与分类。
+- `refreshMenuCache()`：`revalidateTag(menu:{userId})`。
 
-## 3. 菜单 / 订单 / 管理
+## 3. 菜品 / 分类管理
 
-契约与 [PRD](./PRD.md) 一致，已实现：
+- 任意登录用户可进入 `/manage`、`/categories`。
+- `createDish` / `updateDish` / `deleteDishes` 校验归属。
+- `createCategory` / `updateCategory` / `deleteCategory`：同名不可重复；有菜品的分类不可删。
 
-- `fetchMenuSnapshot`、`refreshMenuCache`（标签 `menu`）
-- `createOrder`、`fetchMyOrders`、`fetchOrderDetail`
-- `fetchDishesForManage`、`fetchDishById`、`createDish`、`updateDish`、`deleteDishes`
+## 4. 下单
 
-金额以下单时库内**上架价**重算；明细写入名称/价/图快照。
-
-## 4. `POST /api/upload`
-
-- 需登录且 `role === admin`
-- `multipart/form-data` 字段 `file`
-- 成功：`{ code: 0, data: { url, displayUrl, filename, size } }`
+- `createOrder` 只接受当前用户自己的上架菜品 ID。
 
 ## 5. 变更记录
 
 | 日期 | 说明 |
 |------|------|
-| 2026-07-28 | 初版设计 |
-| 2026-07-28 | 落地实现上述 Actions 与上传接口 |
+| 2026-07-28 | 落地 Actions |
+| 2026-07-28 | 按 user_id 隔离菜单 |
+| 2026-07-28 | 新增分类管理 CRUD |
