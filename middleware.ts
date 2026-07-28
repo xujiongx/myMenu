@@ -20,7 +20,8 @@ export function middleware(request: NextRequest) {
     pathname.startsWith("/mine") ||
     pathname.startsWith("/orders") ||
     pathname.startsWith("/manage") ||
-    pathname.startsWith("/categories");
+    pathname.startsWith("/categories") ||
+    pathname.startsWith("/users");
 
   if (isProtected && !isLoggedIn) {
     const url = request.nextUrl.clone();
@@ -39,5 +40,6 @@ export const config = {
     "/orders/:path*",
     "/manage/:path*",
     "/categories/:path*",
+    "/users/:path*",
   ],
 };

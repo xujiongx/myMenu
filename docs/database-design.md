@@ -49,10 +49,12 @@ erDiagram
 
 | 账号 | 密码 | 说明 |
 |------|------|------|
-| admin | admin123 | 独立菜单（演示菜品较全） |
-| user | user123 | 独立菜单（示例菜品不同） |
+| admin | admin123 | **管理员**；独立菜单；可进入用户管理 |
+| user | user123 | 普通用户；独立菜单（示例菜品不同） |
 
 新用户无分类时，应用会调用 `ensureDefaultCategories` 自动写入默认分类。
+
+管理员可通过「用户管理」创建普通用户（`role=user`）；**不可编辑或删除**账号 `admin` / `role=admin`。
 
 ## 5. 变更记录
 
@@ -60,3 +62,4 @@ erDiagram
 |------|------|
 | 2026-07-28 | 初版 |
 | 2026-07-28 | **每用户独立菜单**：categories/dishes 增加 `user_id` |
+| 2026-07-28 | admin 种子角色恢复为 `admin`；迁移 `003_admin_role.sql` |

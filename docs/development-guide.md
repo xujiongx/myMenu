@@ -37,7 +37,7 @@ flowchart LR
 - **菜单 / 订单**：Server Actions 读写；菜单读走 `unstable_cache`（标签 `menu`）。
 - **图片**：客户端选图 → `POST /api/upload` → ImgBB → URL 写入菜品。
 - **购物车**：仅客户端 `sessionStorage`，结算时 `createOrder`。
-- **布局**：移动端 `max-w-md`；底部双 Tab「点菜 / 我的」；品牌黄对齐设计图。
+- **布局**：移动端 `max-w-md`；底部双 Tab「点菜 / 我的」；品牌黄对齐设计图。二级页（`/manage`、`/categories`、`/orders`、`/users`、`/login`）隐藏底栏。
 
 详见 [database-design.md](./database-design.md)、[api.md](./api.md)、[cache-design.md](./cache-design.md)。
 
@@ -48,10 +48,12 @@ flowchart LR
 ├── middleware.ts                 # 无会话 → /login
 ├── app/
 │   ├── actions/
-│   │   ├── auth.ts               # 登录 / 登出 / 当前用户
+│   │   ├── auth.ts               # 登录 / 登出 / 当前用户 / requireAdmin
 │   │   ├── menu.ts               # 分类、菜品读取、菜单缓存刷新
 │   │   ├── order.ts              # 下单、订单列表/详情
-│   │   └── dish-admin.ts         # 菜品 CRUD（admin）
+│   │   ├── dish-admin.ts         # 菜品 CRUD（本人）
+│   │   ├── category.ts           # 分类 CRUD（本人）
+│   │   └── user-admin.ts         # 用户 CRUD（仅 admin）
 │   ├── api/upload/route.ts       # ImgBB 上传
 │   ├── login/page.tsx
 │   ├── page.tsx                  # 点菜 Tab
@@ -60,6 +62,8 @@ flowchart LR
 │   ├── manage/
 │   │   ├── page.tsx              # 菜品列表管理
 │   │   └── dish/page.tsx         # 新增/编辑（可用 query id）
+│   ├── categories/               # 分类管理
+│   ├── users/                    # 用户管理（仅 admin）
 │   └── layout.tsx                # 壳层、Tab、metadata
 ├── components/
 │   ├── common/                   # TabBar、Loading、空态等
@@ -111,7 +115,7 @@ npm run start
 
 - 登录：居中简约；LOGO 使用 `UtensilsCrossed`（lucide）。
 - 点菜：仅展示**本人**菜单；左右分类滚动联动；详情弹层。
-- 我的：点菜记录、**分类管理**、**我的菜单**、切换账号。
+- 我的：点菜记录、**分类管理**、**我的菜单**、**用户管理（仅 admin）**、切换账号。
 - 图标：lucide-react，见 [icons.md](./icons.md)。
 
 ## 8. FAQ

@@ -92,7 +92,7 @@ insert into public.profiles (id, account, password_hash, nickname, role) values
     'admin',
     '$2b$10$2Q38ZGFhKY.SlJVHIXCwk.cZpLkntRUkCOccaqWdw4IhOr/YJHMTq',
     '店长',
-    'user'
+    'admin'
   ),
   (
     '22222222-2222-2222-2222-222222222002',
@@ -104,6 +104,7 @@ insert into public.profiles (id, account, password_hash, nickname, role) values
 on conflict (account) do update set
   password_hash = excluded.password_hash,
   nickname = excluded.nickname,
+  role = excluded.role,
   updated_at = now();
 
 -- admin 的分类

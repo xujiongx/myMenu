@@ -81,6 +81,9 @@ export function ManageClient({
               className="flex gap-3 rounded-2xl border border-line bg-card p-3 shadow-sm"
             >
               <input
+                placeholder="选择"
+                title="选择"
+                aria-label="选择"
                 type="checkbox"
                 checked={selected.has(dish.id)}
                 onChange={() => toggle(dish.id)}

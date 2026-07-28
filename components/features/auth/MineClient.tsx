@@ -3,7 +3,14 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
-import { ChevronRight, FolderTree, Pencil, ShoppingBag, User } from "lucide-react";
+import {
+  ChevronRight,
+  FolderTree,
+  Pencil,
+  ShoppingBag,
+  User,
+  Users,
+} from "lucide-react";
 import { logoutAction } from "@/app/actions/auth";
 import { CART_STORAGE_KEY, USER_STORAGE_KEY } from "@/lib/constants/branding";
 import { ICON_SIZE } from "@/lib/constants/icon-size";
@@ -23,7 +30,7 @@ export function MineClient({ user }: { user: Profile }) {
   }
 
   return (
-    <div className="min-h-dvh pb-8">
+    <div className="min-h-full pb-8">
       <div className="bg-gradient-to-br from-brand via-[#f6c453] to-[#f59e0b] px-5 pt-[max(2rem,env(safe-area-inset-top))] pb-8">
         <div className="flex items-center gap-4">
           <div className="flex h-16 w-16 items-center justify-center overflow-hidden rounded-full bg-white/90 text-xl font-bold text-brand-deep">
@@ -109,6 +116,29 @@ export function MineClient({ user }: { user: Profile }) {
               aria-hidden
             />
           </button>
+          {user.role === "admin" ? (
+            <button
+              type="button"
+              onClick={() => router.push("/users")}
+              className="flex w-full items-center justify-between border-t border-line px-4 py-4 text-left text-sm active:bg-[#faf7f2]"
+            >
+              <span className="inline-flex items-center gap-2">
+                <Users
+                  size={ICON_SIZE.md}
+                  strokeWidth={1.9}
+                  className="text-muted"
+                  aria-hidden
+                />
+                用户管理
+              </span>
+              <ChevronRight
+                size={ICON_SIZE.sm}
+                strokeWidth={2}
+                className="text-muted"
+                aria-hidden
+              />
+            </button>
+          ) : null}
           <button
             type="button"
             onClick={() => setConfirmSwitch(true)}

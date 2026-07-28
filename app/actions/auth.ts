@@ -41,6 +41,14 @@ export async function requireUser(): Promise<Profile> {
   return sessionToProfile(session);
 }
 
+export async function requireAdmin(): Promise<Profile> {
+  const user = await requireUser();
+  if (user.role !== "admin") {
+    throw new Error("无权限");
+  }
+  return user;
+}
+
 export async function getCurrentUserAction(): Promise<Profile | null> {
   const session = await readSession();
   return session ? sessionToProfile(session) : null;
@@ -107,7 +115,7 @@ export async function ensureSeedPasswordsAction(): Promise<string> {
       account: "admin",
       password: "admin123",
       nickname: "店长",
-      role: "user" as const,
+      role: "admin" as const,
     },
     {
       account: "user",
@@ -128,7 +136,11 @@ export async function ensureSeedPasswordsAction(): Promise<string> {
     if (existing) {
       await supabase
         .from("profiles")
-        .update({ password_hash, updated_at: new Date().toISOString() })
+        .update({
+          password_hash,
+          role: seed.role,
+          updated_at: new Date().toISOString(),
+        })
         .eq("account", seed.account);
     } else {
       await supabase.from("profiles").insert({

@@ -41,7 +41,7 @@ npm run dev
 
 打开 [http://localhost:3000](http://localhost:3000)。
 
-**演示账号**：`admin` / `admin123` · `user` / `user123`（**各自独立菜单**）
+**演示账号**：`admin` / `admin123`（管理员，可用户管理）· `user` / `user123`（**各自独立菜单**）
 
 ## 路由
 
@@ -56,11 +56,14 @@ npm run dev
 | `/manage/dish` | 新增/编辑菜品 |
 | `/categories` | 分类管理 |
 | `/categories/form` | 新增/编辑分类 |
+| `/users` | 用户管理（仅 admin） |
+| `/users/form` | 新增/编辑用户（仅 admin） |
 
 ### 数据库
 
 - 新库：执行 `supabase/migrations/001_init.sql`
 - 已跑过旧版全局菜单：再执行 `002_per_user_menu.sql`
+- 已有库且 admin 角色为 user：再执行 `003_admin_role.sql`
 
 ## 文档
 

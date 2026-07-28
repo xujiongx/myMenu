@@ -42,3 +42,4 @@ import { ICON_SIZE } from "@/lib/constants/icon-size";
 | 刷新 | `RefreshCw` |
 | 占位图 | `Image` / `ImageIcon` |
 | 分类管理 | `FolderTree` |
+| 用户管理 | `Users` |
