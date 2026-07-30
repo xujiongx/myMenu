@@ -11,6 +11,7 @@ import {
 import { PageHeader } from "@/components/common/PageHeader";
 import { DISH_IMAGE_MAX } from "@/lib/constants/branding";
 import { ICON_SIZE } from "@/lib/constants/icon-size";
+import { compressImageForUpload } from "@/lib/menu/compress-image";
 import { dishImages } from "@/lib/menu/dish-images-client";
 import type { Category, Dish, DishStatus } from "@/lib/types";
 
@@ -39,8 +40,9 @@ export function DishForm({
   const { preview, openPreview, closePreview } = useImagePreview();
 
   async function uploadOne(file: File): Promise<string | null> {
+    const compressed = await compressImageForUpload(file);
     const body = new FormData();
-    body.append("file", file);
+    body.append("file", compressed);
     const res = await fetch("/api/upload", { method: "POST", body });
     const json = (await res.json()) as {
       code: number;
@@ -191,7 +193,7 @@ export function DishForm({
                 <Plus size={22} strokeWidth={1.75} aria-hidden />
                 <ImageIcon size={18} strokeWidth={1.75} aria-hidden />
                 <span className="text-xs">
-                  {uploading ? "上传中…" : "添加"}
+                  {uploading ? "压缩上传中…" : "添加"}
                 </span>
               </button>
             ) : null}

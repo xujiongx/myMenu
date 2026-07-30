@@ -45,7 +45,7 @@ export async function POST(request: NextRequest) {
 
     if (file.size > UPLOAD_MAX_BYTES) {
       return NextResponse.json(
-        { code: 400, message: "图片不能超过 5MB" },
+        { code: 400, message: "图片不能超过 3.5MB，请压缩后再传" },
         { status: 400 },
       );
     }

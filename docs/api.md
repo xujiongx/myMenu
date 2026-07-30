@@ -15,7 +15,7 @@
 | 分类 CRUD（仅本人） | `app/actions/category.ts` |
 | 下单 / 订单（仅本人） | `app/actions/order.ts` |
 | 数据统计（仅本人） | `app/actions/stats.ts` |
-| 图片上传 | `app/api/upload/route.ts`（任意登录用户） |
+| 图片上传 | `app/api/upload/route.ts`（任意登录用户；客户端先压缩） |
 | 健康检查 | `app/api/health/route.ts`（Bearer `HEALTH_CHECK_SECRET`） |
 
 ## 2. 菜单
@@ -27,6 +27,7 @@
 
 - 任意登录用户可进入 `/manage`、`/categories`。
 - `createDish` / `updateDish` / `deleteDishes` 校验归属；图片字段 `imageUrls`（最多 9 张），写入同步封面 `image_url`。
+- 上传：`lib/menu/compress-image.ts` 前端压缩（最长边 1920、目标 ≤1.2MB）后再 `POST /api/upload`；服务端上限 3.5MB。
 - `createCategory` / `updateCategory` / `deleteCategory`：同名不可重复；有菜品的分类不可删。
 
 ## 4. 用户管理（admin）
@@ -65,3 +66,4 @@
 | 2026-07-30 | 取消订单 / 移除未付明细（`paid`） |
 | 2026-07-30 | 数据统计与点菜页已点次数 |
 | 2026-07-30 | 菜品多图 `image_urls`；完整显示 + 点击预览 |
+| 2026-07-30 | 上传前前端压缩，规避 Vercel 4.5MB 限制 |

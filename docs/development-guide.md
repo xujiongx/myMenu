@@ -36,7 +36,7 @@ flowchart LR
 - **会话**：自定义账号密码（`profiles`）+ httpOnly JWT Cookie（`menu_session`）；中间件保护业务路由。
 - **品牌 / PWA**：`lib/constants/branding.ts`（`APP_DISPLAY_NAME=小菜单`）；`app/manifest.ts`；图标维护 `app/logo.ico`（同步 `app/icon.ico`、`public/logo.ico`）+ `public/icons/icon-{192,512}.png`；生产环境经 `@serwist/turbopack` 注册 Service Worker（`/serwist/sw.js`），预缓存壳层与静态资源，导航缓存已访问页，离线回退 `/~offline`。
 - **菜单 / 订单**：Server Actions 读写；菜单读走 `unstable_cache`（标签 `menu`）。
-- **图片**：客户端选图（可多张，最多 9）→ 逐张 `POST /api/upload` → ImgBB → `image_urls` 写入菜品，`image_url` 为首图封面；列表/详情 `object-contain`，点击全屏预览。
+- **图片**：客户端选图（可多张，最多 9）→ **前端压缩**（最长边 1920、约 1.2MB）→ 逐张 `POST /api/upload` → ImgBB → `image_urls` 写入菜品；服务端上限 3.5MB（低于 Vercel 4.5MB）。列表/详情 `object-contain`，详情 Swiper 轮播，点击全屏预览。
 - **购物车**：仅客户端 `sessionStorage`；结算 `createOrder`（待支付）；加菜 `addOrderItems`。
 - **布局**：移动端 `max-w-md`；底部双 Tab「点菜 / 我的」；品牌黄对齐设计图。二级页（`/manage`、`/categories`、`/orders`、`/users`、`/login`、加菜 `/orders/[id]/add`）隐藏底栏；二级页顶栏 `PageHeader` 标题居中。
 
@@ -142,7 +142,8 @@ npm run start        # 生产预览；可用「添加到主屏幕」验证 PWA
 | 开发时改代码不生效？ | 开发环境不注册 SW；若曾开过 `next start`，可在浏览器清站点数据 |
 | 主屏幕图标仍旧？ | 删掉主屏幕图标后重新「添加到主屏幕」；确认 `public/icons` 已同步 |
 | 切换账号后仍看到旧菜？ | 清购物车；菜单按用户分键缓存，登录会失效标签 |
-| 上传失败？ | 检查 `IMG_BB_API_KEY`、文件大小/类型 |
+| 上传失败？ | 检查 `IMG_BB_API_KEY`、类型；过大请等前端压缩完成；GIF 勿超过 3.5MB |
+| 线上 FUNCTION_PAYLOAD_TOO_LARGE？ | 请求体超 Vercel 4.5MB；现已前端压缩 + 服务端 3.5MB 上限 |
 | 菜单加载报 image_urls？ | 在 Supabase 执行 `006_dish_image_urls.sql` |
 | 两个演示账号菜不一样？ | 预期：admin 与 user 种子菜单相互独立 |
 

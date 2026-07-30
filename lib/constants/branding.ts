@@ -23,8 +23,12 @@ export const ACCOUNT_EMAIL_DOMAIN = "menu.local";
 /** 应用图标公网路径（与 public/logo.ico、app/logo.ico 同源） */
 export const APP_ICON_PATH = "/logo.ico";
 
-/** 上传限制 */
-export const UPLOAD_MAX_BYTES = 5 * 1024 * 1024;
+/** 上传限制（须低于 Vercel Function ~4.5MB 请求体上限） */
+export const UPLOAD_MAX_BYTES = 3.5 * 1024 * 1024;
+/** 前端压缩目标体积（MB） */
+export const UPLOAD_COMPRESS_MAX_MB = 1.2;
+/** 前端压缩最长边（px） */
+export const UPLOAD_COMPRESS_MAX_EDGE = 1920;
 export const UPLOAD_MIME_TYPES = [
   "image/jpeg",
   "image/png",
