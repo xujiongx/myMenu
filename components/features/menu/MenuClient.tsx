@@ -19,7 +19,6 @@ import {
 import { DishDetailModal } from "@/components/features/menu/DishDetailModal";
 import { CART_STORAGE_KEY } from "@/lib/constants/branding";
 import { ICON_SIZE } from "@/lib/constants/icon-size";
-import { dishImages } from "@/lib/menu/dish-images-client";
 import type { Category, Dish } from "@/lib/types";
 import { ImageIcon, Minus, Plus, RefreshCw, Search, ShoppingCart } from "lucide-react";
 
@@ -315,16 +314,9 @@ export function MenuClient({
                         >
                           <button
                             type="button"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              const urls = dishImages(dish);
-                              if (urls.length > 0) openPreview(urls, 0);
-                              else setDetailDish(dish);
-                            }}
+                            onClick={() => setDetailDish(dish)}
                             className="h-20 w-20 shrink-0 overflow-hidden rounded-xl bg-[#f0e9df] text-left"
-                            aria-label={
-                              dish.imageUrl ? "预览图片" : "查看菜品"
-                            }
+                            aria-label="查看菜品"
                           >
                             {dish.imageUrl ? (
                               // eslint-disable-next-line @next/next/no-img-element
