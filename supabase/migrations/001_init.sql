@@ -35,6 +35,7 @@ create table if not exists public.dishes (
   category_id uuid not null references public.categories (id) on delete restrict,
   name text not null,
   image_url text,
+  image_urls jsonb not null default '[]'::jsonb,
   price numeric(10, 2) not null check (price >= 0),
   description text,
   status text not null default 'on' check (status in ('on', 'off')),

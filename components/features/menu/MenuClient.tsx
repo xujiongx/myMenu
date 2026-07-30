@@ -12,15 +12,22 @@ import { useRouter } from "next/navigation";
 import { addOrderItems, createOrder } from "@/app/actions/order";
 import { refreshMenuCache } from "@/app/actions/menu";
 import { BackLink } from "@/components/common/BackLink";
+import {
+  ImagePreviewHost,
+  useImagePreview,
+} from "@/components/common/ImagePreview";
 import { DishDetailModal } from "@/components/features/menu/DishDetailModal";
 import { CART_STORAGE_KEY } from "@/lib/constants/branding";
 import { ICON_SIZE } from "@/lib/constants/icon-size";
+import { dishImages } from "@/lib/menu/dish-images-client";
 import type { Category, Dish } from "@/lib/types";
 import { ImageIcon, Minus, Plus, RefreshCw, Search, ShoppingCart } from "lucide-react";
 
 type Props = {
   categories: Category[];
   dishes: Dish[];
+  /** 各菜品历史已点份数（非取消订单） */
+  orderCounts?: Record<string, number>;
   /** 加菜目标订单；有值时结算改为加菜 */
   orderId?: string | null;
 };
@@ -45,7 +52,12 @@ function saveCart(cart: Record<string, number>) {
   sessionStorage.setItem(CART_STORAGE_KEY, JSON.stringify(cart));
 }
 
-export function MenuClient({ categories, dishes, orderId }: Props) {
+export function MenuClient({
+  categories,
+  dishes,
+  orderCounts = {},
+  orderId,
+}: Props) {
   const router = useRouter();
   const isAddMode = Boolean(orderId);
   const listRef = useRef<HTMLElement | null>(null);
@@ -63,6 +75,7 @@ export function MenuClient({ categories, dishes, orderId }: Props) {
   const [message, setMessage] = useState<string | null>(null);
   const [detailDish, setDetailDish] = useState<Dish | null>(null);
   const [pending, startTransition] = useTransition();
+  const { preview, openPreview, closePreview } = useImagePreview();
 
   const dishMap = useMemo(
     () => new Map(dishes.map((d) => [d.id, d])),
@@ -294,6 +307,7 @@ export function MenuClient({ categories, dishes, orderId }: Props) {
                   <ul className="space-y-3">
                     {list.map((dish) => {
                       const qty = cart[dish.id] ?? 0;
+                      const ordered = orderCounts[dish.id] ?? 0;
                       return (
                         <li
                           key={dish.id}
@@ -301,15 +315,23 @@ export function MenuClient({ categories, dishes, orderId }: Props) {
                         >
                           <button
                             type="button"
-                            onClick={() => setDetailDish(dish)}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              const urls = dishImages(dish);
+                              if (urls.length > 0) openPreview(urls, 0);
+                              else setDetailDish(dish);
+                            }}
                             className="h-20 w-20 shrink-0 overflow-hidden rounded-xl bg-[#f0e9df] text-left"
+                            aria-label={
+                              dish.imageUrl ? "预览图片" : "查看菜品"
+                            }
                           >
                             {dish.imageUrl ? (
                               // eslint-disable-next-line @next/next/no-img-element
                               <img
                                 src={dish.imageUrl}
                                 alt={dish.name}
-                                className="h-full w-full object-cover"
+                                className="h-full w-full object-contain"
                               />
                             ) : (
                               <div className="flex h-full items-center justify-center text-muted">
@@ -329,6 +351,11 @@ export function MenuClient({ categories, dishes, orderId }: Props) {
                               <p className="mt-0.5 line-clamp-2 text-xs text-muted">
                                 {dish.description || "暂无简介"}
                               </p>
+                              {ordered > 0 ? (
+                                <p className="mt-1 text-[11px] text-brand-deep">
+                                  已点 {ordered} 次
+                                </p>
+                              ) : null}
                             </button>
                             <div className="mt-2 flex items-center justify-between">
                               <span className="font-semibold text-accent">
@@ -410,10 +437,14 @@ export function MenuClient({ categories, dishes, orderId }: Props) {
         <DishDetailModal
           dish={detailDish}
           quantity={cart[detailDish.id] ?? 0}
+          orderedCount={orderCounts[detailDish.id] ?? 0}
           onClose={() => setDetailDish(null)}
           onChangeQty={(delta) => updateQty(detailDish.id, delta)}
+          onPreviewImage={(urls, index) => openPreview(urls, index)}
         />
       ) : null}
+
+      <ImagePreviewHost preview={preview} onClose={closePreview} />
 
       {message ? (
         <button

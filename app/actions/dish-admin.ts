@@ -2,7 +2,12 @@
 
 import { revalidatePath, revalidateTag } from "next/cache";
 import { requireUser } from "@/app/actions/auth";
+import { DISH_IMAGE_MAX } from "@/lib/constants/branding";
 import { ensureDefaultCategories, menuCacheTag } from "@/lib/menu/defaults";
+import {
+  dishImageWritePayload,
+  normalizeDishImageUrls,
+} from "@/lib/menu/images";
 import { createServiceClient } from "@/lib/supabase/service";
 import type { Dish, DishStatus } from "@/lib/types";
 
@@ -11,17 +16,26 @@ type DishRow = {
   category_id: string;
   name: string;
   image_url: string | null;
+  image_urls: unknown;
   price: number | string;
   description: string | null;
   status: DishStatus;
 };
 
+const DISH_SELECT =
+  "id, category_id, name, image_url, image_urls, price, description, status";
+
 function mapDish(row: DishRow): Dish {
+  const imageUrls = normalizeDishImageUrls(
+    row.image_urls ?? null,
+    row.image_url,
+  );
   return {
     id: row.id,
     categoryId: row.category_id,
     name: row.name,
-    imageUrl: row.image_url,
+    imageUrl: imageUrls[0] ?? row.image_url ?? null,
+    imageUrls,
     price: Number(row.price),
     description: row.description,
     status: row.status,
@@ -59,7 +73,7 @@ export async function fetchDishesForManage(input?: {
 
   let query = supabase
     .from("dishes")
-    .select("id, category_id, name, image_url, price, description, status")
+    .select(DISH_SELECT)
     .eq("user_id", user.id)
     .order("updated_at", { ascending: false })
     .range(offset, offset + limit);
@@ -85,7 +99,7 @@ export async function fetchDishById(id: string): Promise<Dish | null> {
   const supabase = createServiceClient();
   const { data, error } = await supabase
     .from("dishes")
-    .select("id, category_id, name, image_url, price, description, status")
+    .select(DISH_SELECT)
     .eq("id", id)
     .eq("user_id", user.id)
     .maybeSingle();
@@ -93,14 +107,27 @@ export async function fetchDishById(id: string): Promise<Dish | null> {
   return data ? mapDish(data as DishRow) : null;
 }
 
-export async function createDish(input: {
+type DishWriteInput = {
   categoryId: string;
   name: string;
+  imageUrls?: string[];
+  /** @deprecated 兼容旧调用；优先 imageUrls */
   imageUrl?: string | null;
   price: number;
   description?: string | null;
   status?: DishStatus;
-}): Promise<{ ok: true; id: string } | { ok: false; error: string }> {
+};
+
+function resolveImageUrls(input: DishWriteInput): string[] {
+  if (input.imageUrls !== undefined) {
+    return input.imageUrls;
+  }
+  return input.imageUrl ? [input.imageUrl] : [];
+}
+
+export async function createDish(
+  input: DishWriteInput,
+): Promise<{ ok: true; id: string } | { ok: false; error: string }> {
   try {
     const user = await requireUser();
     const name = input.name.trim();
@@ -110,7 +137,13 @@ export async function createDish(input: {
       return { ok: false, error: "请输入正确价格" };
     }
 
+    const urls = resolveImageUrls(input);
+    if (urls.length > DISH_IMAGE_MAX) {
+      return { ok: false, error: `最多上传 ${DISH_IMAGE_MAX} 张图片` };
+    }
+
     await assertOwnCategory(user.id, input.categoryId);
+    const images = dishImageWritePayload(urls);
 
     const supabase = createServiceClient();
     const { data, error } = await supabase
@@ -119,7 +152,8 @@ export async function createDish(input: {
         user_id: user.id,
         category_id: input.categoryId,
         name,
-        image_url: input.imageUrl || null,
+        image_url: images.image_url,
+        image_urls: images.image_urls,
         price: input.price,
         description: input.description?.trim() || null,
         status: input.status ?? "on",
@@ -146,21 +180,20 @@ export async function createDish(input: {
 
 export async function updateDish(
   id: string,
-  input: {
-    categoryId: string;
-    name: string;
-    imageUrl?: string | null;
-    price: number;
-    description?: string | null;
-    status?: DishStatus;
-  },
+  input: DishWriteInput,
 ): Promise<{ ok: true } | { ok: false; error: string }> {
   try {
     const user = await requireUser();
     const name = input.name.trim();
     if (!name) return { ok: false, error: "请输入菜品名称" };
 
+    const urls = resolveImageUrls(input);
+    if (urls.length > DISH_IMAGE_MAX) {
+      return { ok: false, error: `最多上传 ${DISH_IMAGE_MAX} 张图片` };
+    }
+
     await assertOwnCategory(user.id, input.categoryId);
+    const images = dishImageWritePayload(urls);
 
     const supabase = createServiceClient();
     const { data, error } = await supabase
@@ -168,7 +201,8 @@ export async function updateDish(
       .update({
         category_id: input.categoryId,
         name,
-        image_url: input.imageUrl || null,
+        image_url: images.image_url,
+        image_urls: images.image_urls,
         price: input.price,
         description: input.description?.trim() || null,
         status: input.status ?? "on",

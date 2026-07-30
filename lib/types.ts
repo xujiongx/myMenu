@@ -20,7 +20,9 @@ export type Dish = {
   id: string;
   categoryId: string;
   name: string;
+  /** 封面 = imageUrls[0] */
   imageUrl: string | null;
+  imageUrls: string[];
   price: number;
   description: string | null;
   status: DishStatus;
@@ -68,4 +70,25 @@ export type OrderDetail = {
   items: OrderItemRow[];
   /** 整单可取消：待支付且无任何已付明细 */
   canCancel: boolean;
+};
+
+/** 菜品下单排行（非取消订单明细聚合） */
+export type DishOrderRank = {
+  dishId: string | null;
+  dishName: string;
+  dishImageUrl: string | null;
+  totalQuantity: number;
+  totalAmount: number;
+};
+
+export type OrderStats = {
+  orderCount: number;
+  totalServings: number;
+  totalSpend: number;
+  statusCounts: {
+    pending: number;
+    confirmed: number;
+    completed: number;
+  };
+  ranking: DishOrderRank[];
 };

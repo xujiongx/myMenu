@@ -1,6 +1,6 @@
 # 小菜单（Next.js 移动端 + Supabase + ImgBB）
 
-轻量移动端点菜：账号登录、分类浏览、加购结算、点菜记录、管理员维护菜品（图片经 ImgBB）。
+轻量移动端点菜：账号登录、分类浏览、加购结算、点菜记录、数据统计、管理员维护菜品（支持多图，经 ImgBB）。
 
 UI：黄色品牌色、笑脸餐盘站标、左右分类点菜、底部双 Tab；支持 **PWA**（添加到主屏幕 + Service Worker 缓存），名称为 **小菜单**。
 
@@ -8,6 +8,7 @@ UI：黄色品牌色、笑脸餐盘站标、左右分类点菜、底部双 Tab�
 
 - Next.js 16（App Router）+ TypeScript + Tailwind CSS 4
 - lucide-react（图标）
+- Swiper（菜品详情多图轮播）
 - Supabase PostgreSQL（Service Role 服务端访问）
 - bcryptjs + jose（账号密码与会话 Cookie）
 - ImgBB（`IMG_BB_API_KEY`，仅服务端上传）
@@ -18,7 +19,9 @@ UI：黄色品牌色、笑脸餐盘站标、左右分类点菜、底部双 Tab�
 
 在 [Supabase SQL Editor](https://supabase.com/dashboard) 执行：
 
-`supabase/migrations/001_init.sql`
+`supabase/migrations/001_init.sql`（新库）
+
+若已有库，按序执行增量：`002`～`006`（含 `006_dish_image_urls.sql` 多图）。
 
 ### 2. 环境变量
 

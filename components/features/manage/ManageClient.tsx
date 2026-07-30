@@ -5,8 +5,13 @@ import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
 import { ImageIcon, Pencil, Plus, Trash2 } from "lucide-react";
 import { deleteDishes } from "@/app/actions/dish-admin";
+import {
+  ImagePreviewHost,
+  useImagePreview,
+} from "@/components/common/ImagePreview";
 import { PageHeader } from "@/components/common/PageHeader";
 import { ICON_SIZE } from "@/lib/constants/icon-size";
+import { dishImages } from "@/lib/menu/dish-images-client";
 import type { Category, Dish } from "@/lib/types";
 
 export function ManageClient({
@@ -22,6 +27,7 @@ export function ManageClient({
   const [confirmIds, setConfirmIds] = useState<string[] | null>(null);
   const [message, setMessage] = useState<string | null>(null);
   const [pending, startTransition] = useTransition();
+  const { preview, openPreview, closePreview } = useImagePreview();
 
   const categoryName = (id: string) =>
     categories.find((c) => c.id === id)?.name ?? "未分类";
@@ -91,12 +97,22 @@ export function ManageClient({
               />
               <div className="h-16 w-16 shrink-0 overflow-hidden rounded-xl bg-[#f0e9df]">
                 {dish.imageUrl ? (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img
-                    src={dish.imageUrl}
-                    alt=""
-                    className="h-full w-full object-cover"
-                  />
+                  <button
+                    type="button"
+                    className="h-full w-full"
+                    onClick={() => {
+                      const urls = dishImages(dish);
+                      if (urls.length > 0) openPreview(urls, 0);
+                    }}
+                    aria-label="预览图片"
+                  >
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      src={dish.imageUrl}
+                      alt=""
+                      className="h-full w-full object-contain"
+                    />
+                  </button>
                 ) : (
                   <div className="flex h-full items-center justify-center text-muted">
                     <ImageIcon size={ICON_SIZE.lg} strokeWidth={1.75} aria-hidden />
@@ -189,6 +205,8 @@ export function ManageClient({
           {message}
         </button>
       ) : null}
+
+      <ImagePreviewHost preview={preview} onClose={closePreview} />
     </div>
   );
 }

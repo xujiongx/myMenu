@@ -21,7 +21,8 @@ export function middleware(request: NextRequest) {
     pathname.startsWith("/orders") ||
     pathname.startsWith("/manage") ||
     pathname.startsWith("/categories") ||
-    pathname.startsWith("/users");
+    pathname.startsWith("/users") ||
+    pathname.startsWith("/stats");
 
   if (isProtected && !isLoggedIn) {
     const url = request.nextUrl.clone();
@@ -41,5 +42,6 @@ export const config = {
     "/manage/:path*",
     "/categories/:path*",
     "/users/:path*",
+    "/stats",
   ],
 };

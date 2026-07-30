@@ -1,22 +1,30 @@
 "use client";
 
-import { ImageIcon, Minus, Plus, X } from "lucide-react";
+import { Minus, Plus, X } from "lucide-react";
+import { DishImageCarousel } from "@/components/common/DishImageCarousel";
 import { ICON_SIZE } from "@/lib/constants/icon-size";
+import { dishImages } from "@/lib/menu/dish-images-client";
 import type { Dish } from "@/lib/types";
 
 type Props = {
   dish: Dish;
   quantity: number;
+  orderedCount?: number;
   onClose: () => void;
   onChangeQty: (delta: number) => void;
+  onPreviewImage?: (urls: string[], index: number) => void;
 };
 
 export function DishDetailModal({
   dish,
   quantity,
+  orderedCount = 0,
   onClose,
   onChangeQty,
+  onPreviewImage,
 }: Props) {
+  const urls = dishImages(dish);
+
   return (
     <div
       className="fixed inset-0 z-50 flex items-end justify-center bg-black/45 sm:items-center"
@@ -29,23 +37,16 @@ export function DishDetailModal({
         className="animate-dish-sheet w-full max-w-md overflow-hidden rounded-t-3xl bg-card shadow-2xl sm:mx-4 sm:rounded-3xl"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="relative h-52 bg-[#f0e9df]">
-          {dish.imageUrl ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img
-              src={dish.imageUrl}
-              alt={dish.name}
-              className="h-full w-full object-cover"
-            />
-          ) : (
-            <div className="flex h-full items-center justify-center text-muted">
-              <ImageIcon size={32} strokeWidth={1.75} aria-hidden />
-            </div>
-          )}
+        <div className="relative">
+          <DishImageCarousel
+            urls={urls}
+            alt={dish.name}
+            onPreview={(index) => onPreviewImage?.(urls, index)}
+          />
           <button
             type="button"
             onClick={onClose}
-            className="absolute top-3 right-3 flex h-8 w-8 items-center justify-center rounded-full bg-black/45 text-white"
+            className="absolute top-3 right-3 z-10 flex h-8 w-8 items-center justify-center rounded-full bg-black/45 text-white"
             aria-label="关闭"
           >
             <X size={ICON_SIZE.close} strokeWidth={2.25} aria-hidden />
@@ -67,6 +68,9 @@ export function DishDetailModal({
           <p className="mt-3 text-sm leading-relaxed text-muted">
             {dish.description || "暂无简介"}
           </p>
+          {orderedCount > 0 ? (
+            <p className="mt-2 text-xs text-brand-deep">已点 {orderedCount} 次</p>
+          ) : null}
 
           <div className="mt-6 flex items-center justify-between">
             <div className="flex items-center gap-2">

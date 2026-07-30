@@ -67,3 +67,17 @@ body {
   animation: dish-sheet-in 0.22s ease-out;
 }
 
+/* 菜品详情 Swiper 分页点 */
+.dish-image-carousel .swiper-pagination {
+  bottom: 10px !important;
+}
+.dish-image-carousel .swiper-pagination-bullet {
+  background: rgba(255, 255, 255, 0.55);
+  opacity: 1;
+}
+.dish-image-carousel .swiper-pagination-bullet-active {
+  background: #fff;
+  width: 16px;
+  border-radius: 999px;
+}
+

@@ -3,10 +3,9 @@
 import { unstable_cache } from "next/cache";
 import { revalidateTag } from "next/cache";
 import { requireUser } from "@/app/actions/auth";
-import {
-  MENU_CACHE_REVALIDATE,
-} from "@/lib/constants/branding";
+import { MENU_CACHE_REVALIDATE } from "@/lib/constants/branding";
 import { ensureDefaultCategories, menuCacheTag } from "@/lib/menu/defaults";
+import { normalizeDishImageUrls } from "@/lib/menu/images";
 import { createServiceClient } from "@/lib/supabase/service";
 import type { Category, Dish, MenuSnapshot } from "@/lib/types";
 
@@ -21,6 +20,7 @@ type DishRow = {
   category_id: string;
   name: string;
   image_url: string | null;
+  image_urls: unknown;
   price: number | string;
   description: string | null;
   status: "on" | "off";
@@ -35,11 +35,16 @@ function mapCategory(row: CategoryRow): Category {
 }
 
 function mapDish(row: DishRow): Dish {
+  const imageUrls = normalizeDishImageUrls(
+    row.image_urls ?? null,
+    row.image_url,
+  );
   return {
     id: row.id,
     categoryId: row.category_id,
     name: row.name,
-    imageUrl: row.image_url,
+    imageUrl: imageUrls[0] ?? row.image_url ?? null,
+    imageUrls,
     price: Number(row.price),
     description: row.description,
     status: row.status,
@@ -56,7 +61,9 @@ async function loadMenuSnapshot(userId: string): Promise<MenuSnapshot> {
       .order("sort_order", { ascending: true }),
     supabase
       .from("dishes")
-      .select("id, category_id, name, image_url, price, description, status")
+      .select(
+        "id, category_id, name, image_url, image_urls, price, description, status",
+      )
       .eq("user_id", userId)
       .eq("status", "on")
       .order("created_at", { ascending: true }),

@@ -14,6 +14,7 @@
 | 菜品 CRUD（仅本人） | `app/actions/dish-admin.ts` |
 | 分类 CRUD（仅本人） | `app/actions/category.ts` |
 | 下单 / 订单（仅本人） | `app/actions/order.ts` |
+| 数据统计（仅本人） | `app/actions/stats.ts` |
 | 图片上传 | `app/api/upload/route.ts`（任意登录用户） |
 | 健康检查 | `app/api/health/route.ts`（Bearer `HEALTH_CHECK_SECRET`） |
 
@@ -25,7 +26,7 @@
 ## 3. 菜品 / 分类管理
 
 - 任意登录用户可进入 `/manage`、`/categories`。
-- `createDish` / `updateDish` / `deleteDishes` 校验归属。
+- `createDish` / `updateDish` / `deleteDishes` 校验归属；图片字段 `imageUrls`（最多 9 张），写入同步封面 `image_url`。
 - `createCategory` / `updateCategory` / `deleteCategory`：同名不可重复；有菜品的分类不可删。
 
 ## 4. 用户管理（admin）
@@ -45,7 +46,13 @@
 - `completeOrder`：仅 `confirmed` → `completed`。
 - 加菜入口：`/orders/[id]/add`（二级页，无底栏）。
 
-## 6. 变更记录
+## 6. 数据统计
+
+- 口径：统计 `pending` / `confirmed` / `completed`；**不含** `cancelled`。
+- `fetchDishOrderCounts()`：按 `dish_id` 累加 `quantity`，供点菜页「已点 N 次」。
+- `fetchOrderStats()`：订单数、总份数、消费额、状态小计、菜品排行（按份数，上限 50）；入口 `/stats`。
+
+## 7. 变更记录
 
 | 日期 | 说明 |
 |------|------|
@@ -56,3 +63,5 @@
 | 2026-07-30 | `/api/health` + GitHub Actions keep-alive |
 | 2026-07-30 | 订单待支付 / 加菜 / 去支付 / 已完成 |
 | 2026-07-30 | 取消订单 / 移除未付明细（`paid`） |
+| 2026-07-30 | 数据统计与点菜页已点次数 |
+| 2026-07-30 | 菜品多图 `image_urls`；完整显示 + 点击预览 |

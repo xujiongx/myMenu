@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
 import {
+  BarChart3,
   ChevronRight,
   FolderTree,
   Pencil,
@@ -66,6 +67,26 @@ export function MineClient({ user }: { user: Profile }) {
                 aria-hidden
               />
               点菜记录
+            </span>
+            <ChevronRight
+              size={ICON_SIZE.sm}
+              strokeWidth={2}
+              className="text-muted"
+              aria-hidden
+            />
+          </Link>
+          <Link
+            href="/stats"
+            className="flex items-center justify-between border-t border-line px-4 py-4 text-sm active:bg-[#faf7f2]"
+          >
+            <span className="inline-flex items-center gap-2">
+              <BarChart3
+                size={ICON_SIZE.md}
+                strokeWidth={1.9}
+                className="text-muted"
+                aria-hidden
+              />
+              数据统计
             </span>
             <ChevronRight
               size={ICON_SIZE.sm}

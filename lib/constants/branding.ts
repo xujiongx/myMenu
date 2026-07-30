@@ -32,6 +32,9 @@ export const UPLOAD_MIME_TYPES = [
   "image/gif",
 ] as const;
 
+/** 单个菜品最多图片数 */
+export const DISH_IMAGE_MAX = 9;
+
 export const MENU_CACHE_TAG = "menu";
 export const MENU_CACHE_REVALIDATE = 300;
 

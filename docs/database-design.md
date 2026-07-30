@@ -39,7 +39,11 @@ erDiagram
 |------|------|
 | user_id | 所属用户 |
 | category_id | 必须属于同一 user_id 的分类 |
+| image_url | 封面图（= `image_urls` 首项），供订单明细快照 |
+| image_urls | jsonb URL 数组，最多 9 张；顺序即展示顺序 |
 | 唯一 | `(user_id, category_id, name)` |
+
+迁移：`006_dish_image_urls.sql`（存量 `image_url` 回填进数组）。
 
 ### 3.3 `orders` / `order_items`
 
@@ -72,3 +76,4 @@ erDiagram
 | 2026-07-28 | admin 种子角色恢复为 `admin`；迁移 `003_admin_role.sql` |
 | 2026-07-30 | 订单 `payable_amount`；待支付 / 加菜 / 去支付流程 |
 | 2026-07-30 | `order_items.paid`；取消订单 / 移除未付加菜 |
+| 2026-07-30 | `dishes.image_urls` 多图；`image_url` 作封面 |

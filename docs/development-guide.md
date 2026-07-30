@@ -36,7 +36,7 @@ flowchart LR
 - **会话**：自定义账号密码（`profiles`）+ httpOnly JWT Cookie（`menu_session`）；中间件保护业务路由。
 - **品牌 / PWA**：`lib/constants/branding.ts`（`APP_DISPLAY_NAME=小菜单`）；`app/manifest.ts`；图标维护 `app/logo.ico`（同步 `app/icon.ico`、`public/logo.ico`）+ `public/icons/icon-{192,512}.png`；生产环境经 `@serwist/turbopack` 注册 Service Worker（`/serwist/sw.js`），预缓存壳层与静态资源，导航缓存已访问页，离线回退 `/~offline`。
 - **菜单 / 订单**：Server Actions 读写；菜单读走 `unstable_cache`（标签 `menu`）。
-- **图片**：客户端选图 → `POST /api/upload` → ImgBB → URL 写入菜品。
+- **图片**：客户端选图（可多张，最多 9）→ 逐张 `POST /api/upload` → ImgBB → `image_urls` 写入菜品，`image_url` 为首图封面；列表/详情 `object-contain`，点击全屏预览。
 - **购物车**：仅客户端 `sessionStorage`；结算 `createOrder`（待支付）；加菜 `addOrderItems`。
 - **布局**：移动端 `max-w-md`；底部双 Tab「点菜 / 我的」；品牌黄对齐设计图。二级页（`/manage`、`/categories`、`/orders`、`/users`、`/login`、加菜 `/orders/[id]/add`）隐藏底栏；二级页顶栏 `PageHeader` 标题居中。
 
@@ -52,6 +52,7 @@ flowchart LR
 │   │   ├── auth.ts               # 登录 / 登出 / 当前用户 / requireAdmin
 │   │   ├── menu.ts               # 分类、菜品读取、菜单缓存刷新
 │   │   ├── order.ts              # 下单/加菜/支付/完成、列表与详情
+│   │   ├── stats.ts              # 已点次数与数据统计
 │   │   ├── dish-admin.ts         # 菜品 CRUD（本人）
 │   │   ├── category.ts           # 分类 CRUD（本人）
 │   │   └── user-admin.ts         # 用户 CRUD（仅 admin）
@@ -66,6 +67,7 @@ flowchart LR
 │   ├── page.tsx                  # 点菜 Tab
 │   ├── mine/page.tsx             # 我的 Tab
 │   ├── orders/page.tsx           # 点菜记录
+│   ├── stats/page.tsx            # 数据统计（排行与汇总）
 │   ├── manage/
 │   │   ├── page.tsx              # 菜品列表管理
 │   │   └── dish/page.tsx         # 新增/编辑（可用 query id）
@@ -73,11 +75,12 @@ flowchart LR
 │   ├── users/                    # 用户管理（仅 admin）
 │   └── layout.tsx                # 壳层、Tab、metadata、PWA 注册
 ├── components/
-│   ├── common/                   # AppShell、AppLogo、PwaProvider、PageHeader 等
+│   ├── common/                   # AppShell、AppLogo、PwaProvider、PageHeader、ImagePreview、DishImageCarousel 等
 │   └── features/
 │       ├── auth/
 │       ├── menu/                 # 分类栏、菜品卡、购物车栏
 │       ├── order/
+│       ├── stats/                # 数据统计页
 │       └── manage/
 ├── lib/
 │   ├── supabase/                 # server / client / middleware 客户端
@@ -125,8 +128,9 @@ npm run start        # 生产预览；可用「添加到主屏幕」验证 PWA
 ## 7. UI / 交互要点（对齐 PRD）
 
 - 登录：居中简约；LOGO 使用站标 `/logo.ico`。
-- 点菜：仅展示**本人**菜单；左右分类滚动联动；详情弹层。
-- 我的：点菜记录、**分类管理**、**我的菜单**、**用户管理（仅 admin）**、切换账号。
+- 点菜：仅展示**本人**菜单；左右分类滚动联动；详情弹层；有历史下单时显示「已点 N 次」。
+- 我的：点菜记录、**数据统计**、**分类管理**、**我的菜单**、**用户管理（仅 admin）**、切换账号。
+- 数据统计：`/stats`，非取消订单汇总 + 菜品下单排行。
 - 图标：lucide-react，见 [icons.md](./icons.md)。
 - PWA：生产构建后安装到主屏幕；二次打开走 SW 缓存，弱网可进壳层与已访问页。
 
@@ -139,6 +143,7 @@ npm run start        # 生产预览；可用「添加到主屏幕」验证 PWA
 | 主屏幕图标仍旧？ | 删掉主屏幕图标后重新「添加到主屏幕」；确认 `public/icons` 已同步 |
 | 切换账号后仍看到旧菜？ | 清购物车；菜单按用户分键缓存，登录会失效标签 |
 | 上传失败？ | 检查 `IMG_BB_API_KEY`、文件大小/类型 |
+| 菜单加载报 image_urls？ | 在 Supabase 执行 `006_dish_image_urls.sql` |
 | 两个演示账号菜不一样？ | 预期：admin 与 user 种子菜单相互独立 |
 
 ## 9. 相关文档

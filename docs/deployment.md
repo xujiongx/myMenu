@@ -55,7 +55,7 @@ flowchart TB
 ### 5.1 首次部署
 
 1. 在 Supabase SQL Editor 执行迁移（`supabase/migrations/*`，实现阶段提供）。
-2. 执行迁移：新库用 `001_init.sql`；旧库追加 `002_per_user_menu.sql`。  
+2. 执行迁移：新库用 `001_init.sql`；旧库按序追加 `002`～`006`（含多图 `006_dish_image_urls.sql`）。  
 3. 用演示账号验证：admin / user 菜单互不相同；均可进入「我的菜单」管理；仅 admin 可见「用户管理」。
 
 ### 5.2 常规发布

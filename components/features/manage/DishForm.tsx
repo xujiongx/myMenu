@@ -1,11 +1,17 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useState, useTransition } from "react";
-import { ImageIcon } from "lucide-react";
+import { useRef, useState, useTransition } from "react";
+import { ImageIcon, Plus, X } from "lucide-react";
 import { createDish, updateDish } from "@/app/actions/dish-admin";
+import {
+  ImagePreviewHost,
+  useImagePreview,
+} from "@/components/common/ImagePreview";
 import { PageHeader } from "@/components/common/PageHeader";
+import { DISH_IMAGE_MAX } from "@/lib/constants/branding";
 import { ICON_SIZE } from "@/lib/constants/icon-size";
+import { dishImages } from "@/lib/menu/dish-images-client";
 import type { Category, Dish, DishStatus } from "@/lib/types";
 
 export function DishForm({
@@ -16,6 +22,7 @@ export function DishForm({
   dish: Dish | null;
 }) {
   const router = useRouter();
+  const fileRef = useRef<HTMLInputElement>(null);
   const [categoryId, setCategoryId] = useState(
     dish?.categoryId ?? categories[0]?.id ?? "",
   );
@@ -23,34 +30,60 @@ export function DishForm({
   const [price, setPrice] = useState(dish ? String(dish.price) : "");
   const [description, setDescription] = useState(dish?.description ?? "");
   const [status, setStatus] = useState<DishStatus>(dish?.status ?? "on");
-  const [imageUrl, setImageUrl] = useState(dish?.imageUrl ?? "");
+  const [imageUrls, setImageUrls] = useState<string[]>(() =>
+    dish ? dishImages(dish) : [],
+  );
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [pending, startTransition] = useTransition();
+  const { preview, openPreview, closePreview } = useImagePreview();
 
-  async function onUpload(file: File | null) {
-    if (!file) return;
+  async function uploadOne(file: File): Promise<string | null> {
+    const body = new FormData();
+    body.append("file", file);
+    const res = await fetch("/api/upload", { method: "POST", body });
+    const json = (await res.json()) as {
+      code: number;
+      message?: string;
+      data?: { url: string };
+    };
+    if (json.code !== 0 || !json.data?.url) {
+      throw new Error(json.message || "上传图片失败");
+    }
+    return json.data.url;
+  }
+
+  async function onUploadFiles(files: FileList | null) {
+    if (!files || files.length === 0) return;
+    const room = DISH_IMAGE_MAX - imageUrls.length;
+    if (room <= 0) {
+      setError(`最多上传 ${DISH_IMAGE_MAX} 张图片`);
+      return;
+    }
+
+    const picked = Array.from(files).slice(0, room);
     setUploading(true);
     setError(null);
     try {
-      const body = new FormData();
-      body.append("file", file);
-      const res = await fetch("/api/upload", { method: "POST", body });
-      const json = (await res.json()) as {
-        code: number;
-        message?: string;
-        data?: { url: string };
-      };
-      if (json.code !== 0 || !json.data?.url) {
-        setError(json.message || "上传图片失败");
-        return;
+      const uploaded: string[] = [];
+      for (const file of picked) {
+        const url = await uploadOne(file);
+        if (url) uploaded.push(url);
       }
-      setImageUrl(json.data.url);
-    } catch {
-      setError("上传图片失败");
+      setImageUrls((prev) => [...prev, ...uploaded].slice(0, DISH_IMAGE_MAX));
+      if (files.length > room) {
+        setError(`最多 ${DISH_IMAGE_MAX} 张，已保留前 ${room} 张`);
+      }
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "上传图片失败");
     } finally {
       setUploading(false);
+      if (fileRef.current) fileRef.current.value = "";
     }
+  }
+
+  function removeImage(index: number) {
+    setImageUrls((prev) => prev.filter((_, i) => i !== index));
   }
 
   function onSubmit(e: React.FormEvent) {
@@ -63,7 +96,7 @@ export function DishForm({
         price: priceNum,
         description,
         status,
-        imageUrl: imageUrl || null,
+        imageUrls,
       };
       const result = dish
         ? await updateDish(dish.id, payload)
@@ -111,28 +144,66 @@ export function DishForm({
         </label>
 
         <div>
-          <span className="mb-1.5 block text-sm text-muted">菜品图片</span>
-          <label className="flex h-36 cursor-pointer flex-col items-center justify-center overflow-hidden rounded-2xl border border-dashed border-line bg-card">
-            {imageUrl ? (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img
-                src={imageUrl}
-                alt=""
-                className="h-full w-full object-cover"
-              />
-            ) : (
-              <span className="flex flex-col items-center gap-2 text-sm text-muted">
-                <ImageIcon size={28} strokeWidth={1.75} aria-hidden />
-                {uploading ? "上传中…" : "点击上传图片"}
-              </span>
-            )}
-            <input
-              type="file"
-              accept="image/jpeg,image/png,image/webp,image/gif"
-              className="hidden"
-              onChange={(e) => onUpload(e.target.files?.[0] ?? null)}
-            />
-          </label>
+          <span className="mb-1.5 block text-sm text-muted">
+            菜品图片（最多 {DISH_IMAGE_MAX} 张，首张为封面）
+          </span>
+          <div className="grid grid-cols-3 gap-2">
+            {imageUrls.map((url, index) => (
+              <div
+                key={`${url}-${index}`}
+                className="relative aspect-square overflow-hidden rounded-2xl border border-line bg-[#f0e9df]"
+              >
+                <button
+                  type="button"
+                  className="h-full w-full"
+                  onClick={() => openPreview(imageUrls, index)}
+                  aria-label={`预览第 ${index + 1} 张`}
+                >
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={url}
+                    alt=""
+                    className="h-full w-full object-contain"
+                  />
+                </button>
+                <button
+                  type="button"
+                  onClick={() => removeImage(index)}
+                  className="absolute top-1.5 right-1.5 flex h-6 w-6 items-center justify-center rounded-full bg-black/55 text-white"
+                  aria-label="删除图片"
+                >
+                  <X size={14} strokeWidth={2.25} aria-hidden />
+                </button>
+                {index === 0 ? (
+                  <span className="absolute bottom-1.5 left-1.5 rounded bg-black/50 px-1.5 py-0.5 text-[10px] text-white">
+                    封面
+                  </span>
+                ) : null}
+              </div>
+            ))}
+            {imageUrls.length < DISH_IMAGE_MAX ? (
+              <button
+                type="button"
+                disabled={uploading}
+                onClick={() => fileRef.current?.click()}
+                className="flex aspect-square flex-col items-center justify-center gap-1 rounded-2xl border border-dashed border-line bg-card text-sm text-muted disabled:opacity-60"
+              >
+                <Plus size={22} strokeWidth={1.75} aria-hidden />
+                <ImageIcon size={18} strokeWidth={1.75} aria-hidden />
+                <span className="text-xs">
+                  {uploading ? "上传中…" : "添加"}
+                </span>
+              </button>
+            ) : null}
+          </div>
+          <input
+            ref={fileRef}
+            type="file"
+            accept="image/jpeg,image/png,image/webp,image/gif"
+            multiple
+            className="hidden"
+            onChange={(e) => onUploadFiles(e.target.files)}
+          />
         </div>
 
         <label className="block">
@@ -197,6 +268,8 @@ export function DishForm({
           </p>
         ) : null}
       </form>
+
+      <ImagePreviewHost preview={preview} onClose={closePreview} />
     </div>
   );
 }
