@@ -9,9 +9,11 @@ export const { dynamic, dynamicParams, revalidate, generateStaticParams, GET } =
   createSerwistRoute({
     additionalPrecacheEntries: [
       { url: "/~offline", revision },
+      { url: "/login", revision },
       { url: "/logo.ico", revision },
       { url: "/icons/icon-192.png", revision },
       { url: "/icons/icon-512.png", revision },
+      { url: "/manifest.webmanifest", revision },
     ],
     swSrc: "app/sw.ts",
     useNativeEsbuild: true,

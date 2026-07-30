@@ -39,6 +39,7 @@ flowchart LR
 - **图片**：客户端选图（可多张，最多 9）→ **前端压缩**（最长边 1920、约 1.2MB）→ 逐张 `POST /api/upload` → ImgBB → `image_urls` 写入菜品；服务端上限 3.5MB（低于 Vercel 4.5MB）。列表/详情 `object-contain`，详情 Swiper 轮播，点击全屏预览。
 - **购物车**：仅客户端 `sessionStorage`；结算 `createOrder`（待支付）；加菜 `addOrderItems`。
 - **布局**：移动端 `max-w-md`；底部双 Tab「点菜 / 我的」；品牌黄对齐设计图。二级页（`/manage`、`/categories`、`/orders`、`/users`、`/login`、加菜 `/orders/[id]/add`）隐藏底栏；二级页顶栏 `PageHeader` 标题居中。
+- **首屏**：`BootSplash` 品牌加载壳 + `html/body` 底色；点菜页先出菜单，已点次数客户端延后拉取；PWA 预缓存 `/login`、图标与 manifest。
 
 详见 [database-design.md](./database-design.md)、[api.md](./api.md)、[cache-design.md](./cache-design.md)。
 

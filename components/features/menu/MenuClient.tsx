@@ -11,6 +11,7 @@ import {
 import { useRouter } from "next/navigation";
 import { addOrderItems, createOrder } from "@/app/actions/order";
 import { refreshMenuCache } from "@/app/actions/menu";
+import { fetchDishOrderCounts } from "@/app/actions/stats";
 import { BackLink } from "@/components/common/BackLink";
 import {
   ImagePreviewHost,
@@ -25,8 +26,6 @@ import { ImageIcon, Minus, Plus, RefreshCw, Search, ShoppingCart } from "lucide-
 type Props = {
   categories: Category[];
   dishes: Dish[];
-  /** 各菜品历史已点份数（非取消订单） */
-  orderCounts?: Record<string, number>;
   /** 加菜目标订单；有值时结算改为加菜 */
   orderId?: string | null;
 };
@@ -51,12 +50,7 @@ function saveCart(cart: Record<string, number>) {
   sessionStorage.setItem(CART_STORAGE_KEY, JSON.stringify(cart));
 }
 
-export function MenuClient({
-  categories,
-  dishes,
-  orderCounts = {},
-  orderId,
-}: Props) {
+export function MenuClient({ categories, dishes, orderId }: Props) {
   const router = useRouter();
   const isAddMode = Boolean(orderId);
   const listRef = useRef<HTMLElement | null>(null);
@@ -73,8 +67,23 @@ export function MenuClient({
   const [keyword, setKeyword] = useState("");
   const [message, setMessage] = useState<string | null>(null);
   const [detailDish, setDetailDish] = useState<Dish | null>(null);
+  const [orderCounts, setOrderCounts] = useState<Record<string, number>>({});
   const [pending, startTransition] = useTransition();
   const { preview, openPreview, closePreview } = useImagePreview();
+
+  useEffect(() => {
+    let cancelled = false;
+    void fetchDishOrderCounts()
+      .then((counts) => {
+        if (!cancelled) setOrderCounts(counts);
+      })
+      .catch(() => {
+        /* 已点次数非关键路径，失败静默 */
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   const dishMap = useMemo(
     () => new Map(dishes.map((d) => [d.id, d])),

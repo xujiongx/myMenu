@@ -13,12 +13,16 @@ import "./globals.css";
 const sans = Manrope({
   subsets: ["latin"],
   variable: "--font-app-sans",
+  display: "swap",
+  preload: true,
 });
 
 const display = ZCOOL_XiaoWei({
   weight: "400",
   subsets: ["latin"],
   variable: "--font-app-display",
+  display: "swap",
+  preload: true,
 });
 
 export const metadata: Metadata = {
@@ -60,8 +64,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="zh-CN">
-      <body className={`${sans.variable} ${display.variable} antialiased`}>
+    <html lang="zh-CN" style={{ backgroundColor: "#f7f4ef" }}>
+      <body
+        className={`${sans.variable} ${display.variable} antialiased`}
+        style={{ backgroundColor: "#f7f4ef" }}
+      >
         <PwaProvider>
           <AppShell>{children}</AppShell>
         </PwaProvider>

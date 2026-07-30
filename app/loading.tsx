@@ -1,7 +1,5 @@
+import { BootSplash } from "@/components/common/BootSplash";
+
 export default function Loading() {
-  return (
-    <div className="flex min-h-dvh items-center justify-center text-sm text-muted">
-      加载中…
-    </div>
-  );
+  return <BootSplash />;
 }

@@ -1,7 +1,6 @@
 import { redirect } from "next/navigation";
 import { getCurrentUserAction } from "@/app/actions/auth";
 import { fetchMenuSnapshot } from "@/app/actions/menu";
-import { fetchDishOrderCounts } from "@/app/actions/stats";
 import { MenuClient } from "@/components/features/menu/MenuClient";
 
 export default async function HomePage() {
@@ -12,17 +11,13 @@ export default async function HomePage() {
     ReturnType<typeof fetchMenuSnapshot>
   >["categories"];
   let dishes = [] as Awaited<ReturnType<typeof fetchMenuSnapshot>>["dishes"];
-  let orderCounts: Record<string, number> = {};
   let error: string | null = null;
 
   try {
-    const [snapshot, counts] = await Promise.all([
-      fetchMenuSnapshot(),
-      fetchDishOrderCounts(),
-    ]);
+    // 仅阻塞菜单快照；已点次数改客户端延后加载，缩短首屏白屏
+    const snapshot = await fetchMenuSnapshot();
     categories = snapshot.categories;
     dishes = snapshot.dishes;
-    orderCounts = counts;
   } catch (e) {
     console.error(e);
     error = e instanceof Error ? e.message : "加载菜单失败";
@@ -37,11 +32,5 @@ export default async function HomePage() {
     );
   }
 
-  return (
-    <MenuClient
-      categories={categories}
-      dishes={dishes}
-      orderCounts={orderCounts}
-    />
-  );
+  return <MenuClient categories={categories} dishes={dishes} />;
 }
