@@ -4,7 +4,7 @@ import { revalidatePath } from "next/cache";
 import { requireUser } from "@/app/actions/auth";
 import { ORDER_PAGE_SIZE } from "@/lib/constants/branding";
 import { createServiceClient } from "@/lib/supabase/service";
-import type { OrderDetail, OrderSummary } from "@/lib/types";
+import type { OrderDetail, OrderStatus, OrderSummary } from "@/lib/types";
 
 type LineInput = { dishId: string; quantity: number };
 
@@ -470,20 +470,78 @@ export async function removeUnpaidOrderItem(
 export async function fetchMyOrders(input?: {
   offset?: number;
   limit?: number;
+  /** 按菜品名模糊搜索（含历史快照名） */
+  keyword?: string;
+  status?: OrderStatus | "all";
 }): Promise<{ orders: OrderSummary[]; hasMore: boolean }> {
   const user = await requireUser();
   const offset = input?.offset ?? 0;
   const limit = Math.min(input?.limit ?? ORDER_PAGE_SIZE, 50);
+  const keyword = input?.keyword?.trim() ?? "";
+  const status =
+    input?.status && input.status !== "all" ? input.status : undefined;
   const supabase = createServiceClient();
 
-  const { data, error } = await supabase
+  let orderIds: string[] | null = null;
+
+  if (keyword) {
+    const { data: matchedItems, error: matchErr } = await supabase
+      .from("order_items")
+      .select("order_id, orders!inner(user_id)")
+      .eq("orders.user_id", user.id)
+      .ilike("dish_name", `%${keyword}%`);
+
+    if (matchErr) {
+      console.error("fetchMyOrders match", matchErr);
+      throw new Error("搜索订单失败");
+    }
+
+    const idSet = new Set<string>();
+    for (const row of matchedItems ?? []) {
+      if (typeof row.order_id === "string") idSet.add(row.order_id);
+    }
+
+    // 订单号片段（列表展示前 8 位）；过短关键字易误伤 UUID
+    if (keyword.length >= 4) {
+      const { data: idRows, error: idErr } = await supabase
+        .from("orders")
+        .select("id")
+        .eq("user_id", user.id);
+
+      if (idErr) {
+        console.error("fetchMyOrders id scan", idErr);
+        throw new Error("搜索订单失败");
+      }
+
+      const qLower = keyword.toLowerCase();
+      for (const row of idRows ?? []) {
+        const id = row.id as string;
+        if (id.toLowerCase().includes(qLower)) idSet.add(id);
+      }
+    }
+
+    orderIds = [...idSet];
+    if (orderIds.length === 0) {
+      return { orders: [], hasMore: false };
+    }
+  }
+
+  let query = supabase
     .from("orders")
     .select(
       "id, total_amount, payable_amount, status, created_at, order_items(dish_name, quantity)",
     )
     .eq("user_id", user.id)
-    .order("created_at", { ascending: false })
-    .range(offset, offset + limit);
+    .order("created_at", { ascending: false });
+
+  if (orderIds) {
+    query = query.in("id", orderIds);
+  }
+  if (status) {
+    query = query.eq("status", status);
+  }
+
+  const { data, error } = await query.range(offset, offset + limit);
 
   if (error) {
     console.error("fetchMyOrders", error);

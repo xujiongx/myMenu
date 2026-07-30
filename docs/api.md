@@ -46,6 +46,7 @@
 - `removeUnpaidOrderItem`：待支付下移除未付明细；全部移除则删单；未付清零且仍有已付 → 回 `confirmed`。
 - `completeOrder`：仅 `confirmed` → `completed`。
 - 加菜入口：`/orders/[id]/add`（二级页，无底栏）。
+- `fetchMyOrders({ keyword, status, offset })`：可按菜品名模糊搜、按状态筛；关键字 ≥4 位时也可匹配订单号片段。
 
 ## 6. 数据统计
 
