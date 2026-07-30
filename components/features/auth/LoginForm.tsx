@@ -2,10 +2,9 @@
 
 import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
-import { UtensilsCrossed } from "lucide-react";
 import { loginAction } from "@/app/actions/auth";
+import { AppLogo } from "@/components/common/AppLogo";
 import { APP_DISPLAY_NAME, USER_STORAGE_KEY } from "@/lib/constants/branding";
-import { ICON_SIZE } from "@/lib/constants/icon-size";
 
 export function LoginForm() {
   const router = useRouter();
@@ -51,8 +50,8 @@ export function LoginForm() {
   return (
     <div className="flex min-h-dvh flex-col px-6 pb-10 pt-16">
       <div className="mb-10 flex flex-col items-center text-center">
-        <div className="mb-4 flex h-20 w-20 items-center justify-center rounded-full bg-brand text-[#3b2a00] shadow-[0_10px_30px_rgba(240,180,41,0.45)]">
-          <UtensilsCrossed size={ICON_SIZE.logo} strokeWidth={1.75} aria-hidden />
+        <div className="mb-4 overflow-hidden rounded-full bg-brand shadow-[0_10px_30px_rgba(240,180,41,0.45)]">
+          <AppLogo size={80} className="rounded-full" />
         </div>
         <h1 className="font-display text-3xl tracking-wide text-foreground">
           {APP_DISPLAY_NAME}

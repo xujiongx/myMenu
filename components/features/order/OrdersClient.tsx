@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useMemo, useState, useTransition } from "react";
 import { fetchMyOrders } from "@/app/actions/order";
-import { BackLink } from "@/components/common/BackLink";
+import { PageHeader } from "@/components/common/PageHeader";
 import type { OrderStatus, OrderSummary } from "@/lib/types";
 
 const FILTERS: { key: "all" | OrderStatus; label: string }[] = [
@@ -47,13 +47,9 @@ export function OrdersClient({
   }
 
   return (
-    <div className="min-h-dvh bg-background pb-8">
-      <header className="sticky top-0 z-10 border-b border-line bg-[#fffaf2]/95 px-4 pb-3 pt-[max(0.75rem,env(safe-area-inset-top))] backdrop-blur">
-        <div className="mb-3 flex items-center gap-3">
-          <BackLink href="/mine" />
-          <h1 className="font-display text-xl">点菜记录</h1>
-        </div>
-        <div className="flex gap-2 overflow-x-auto pb-1">
+    <div className="min-h-full bg-background pb-8">
+      <PageHeader backHref="/mine" title="点菜记录" className="pb-3">
+        <div className="mt-3 flex gap-2 overflow-x-auto pb-1">
           {FILTERS.map((f) => (
             <button
               key={f.key}
@@ -69,7 +65,7 @@ export function OrdersClient({
             </button>
           ))}
         </div>
-      </header>
+      </PageHeader>
 
       <div className="space-y-3 px-4 py-4">
         {visible.length === 0 ? (
@@ -102,7 +98,9 @@ export function OrdersClient({
                   {new Date(order.createdAt).toLocaleString("zh-CN")}
                 </span>
                 <span className="font-semibold text-accent">
-                  ¥{order.totalAmount.toFixed(2)}
+                  {order.status === "pending"
+                    ? `待付 ¥${order.payableAmount.toFixed(2)}`
+                    : `¥${order.totalAmount.toFixed(2)}`}
                 </span>
               </div>
             </Link>

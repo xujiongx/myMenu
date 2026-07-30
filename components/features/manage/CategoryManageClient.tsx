@@ -8,7 +8,7 @@ import {
   deleteCategory,
   type CategoryManageItem,
 } from "@/app/actions/category";
-import { BackLink } from "@/components/common/BackLink";
+import { PageHeader } from "@/components/common/PageHeader";
 import { ICON_SIZE } from "@/lib/constants/icon-size";
 
 export function CategoryManageClient({
@@ -37,13 +37,8 @@ export function CategoryManageClient({
   }
 
   return (
-    <div className="min-h-dvh pb-24">
-      <header className="sticky top-0 z-10 flex items-center justify-between border-b border-line bg-[#fffaf2]/95 px-4 py-3 pt-[max(0.75rem,env(safe-area-inset-top))] backdrop-blur">
-        <div className="flex items-center gap-3">
-          <BackLink href="/mine" />
-          <h1 className="font-display text-xl">分类管理</h1>
-        </div>
-      </header>
+    <div className="min-h-full pb-24">
+      <PageHeader backHref="/mine" title="分类管理" />
 
       <div className="space-y-3 px-4 py-4">
         {categories.length === 0 ? (

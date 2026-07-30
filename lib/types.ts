@@ -44,11 +44,15 @@ export type OrderItemRow = {
   unitPrice: number;
   quantity: number;
   lineAmount: number;
+  /** 是否已支付；未支付可移除 */
+  paid: boolean;
 };
 
 export type OrderSummary = {
   id: string;
   totalAmount: number;
+  /** 当前待支付金额（待支付状态） */
+  payableAmount: number;
   status: OrderStatus;
   createdAt: string;
   itemsPreview: { dishName: string; quantity: number }[];
@@ -57,8 +61,11 @@ export type OrderSummary = {
 export type OrderDetail = {
   id: string;
   totalAmount: number;
+  payableAmount: number;
   status: OrderStatus;
   remark: string | null;
   createdAt: string;
   items: OrderItemRow[];
+  /** 整单可取消：待支付且无任何已付明细 */
+  canCancel: boolean;
 };

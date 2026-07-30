@@ -9,8 +9,9 @@ import {
   useTransition,
 } from "react";
 import { useRouter } from "next/navigation";
-import { createOrder } from "@/app/actions/order";
+import { addOrderItems, createOrder } from "@/app/actions/order";
 import { refreshMenuCache } from "@/app/actions/menu";
+import { BackLink } from "@/components/common/BackLink";
 import { DishDetailModal } from "@/components/features/menu/DishDetailModal";
 import { CART_STORAGE_KEY } from "@/lib/constants/branding";
 import { ICON_SIZE } from "@/lib/constants/icon-size";
@@ -20,11 +21,15 @@ import { ImageIcon, Minus, Plus, RefreshCw, Search, ShoppingCart } from "lucide-
 type Props = {
   categories: Category[];
   dishes: Dish[];
+  /** 加菜目标订单；有值时结算改为加菜 */
+  orderId?: string | null;
 };
 
-/** 底 Tab 高度约 3.75rem + safe-area；再留 0.75rem 空隙 */
-const CART_BOTTOM =
+/** 有底栏时抬高购物车；加菜二级页无底栏贴底留白 */
+const CART_BOTTOM_TAB =
   "bottom-[calc(4.5rem+env(safe-area-inset-bottom))]";
+const CART_BOTTOM_PLAIN =
+  "bottom-[max(1rem,env(safe-area-inset-bottom))]";
 
 function loadCart(): Record<string, number> {
   if (typeof window === "undefined") return {};
@@ -40,8 +45,9 @@ function saveCart(cart: Record<string, number>) {
   sessionStorage.setItem(CART_STORAGE_KEY, JSON.stringify(cart));
 }
 
-export function MenuClient({ categories, dishes }: Props) {
+export function MenuClient({ categories, dishes, orderId }: Props) {
   const router = useRouter();
+  const isAddMode = Boolean(orderId);
   const listRef = useRef<HTMLElement | null>(null);
   const categoryBtnRefs = useRef<Record<string, HTMLButtonElement | null>>({});
   const scrollingByClick = useRef(false);
@@ -50,7 +56,9 @@ export function MenuClient({ categories, dishes }: Props) {
   const [activeCategoryId, setActiveCategoryId] = useState(
     categories[0]?.id ?? "",
   );
-  const [cart, setCart] = useState<Record<string, number>>(() => loadCart());
+  const [cart, setCart] = useState<Record<string, number>>(() =>
+    orderId ? {} : loadCart(),
+  );
   const [keyword, setKeyword] = useState("");
   const [message, setMessage] = useState<string | null>(null);
   const [detailDish, setDetailDish] = useState<Dish | null>(null);
@@ -170,6 +178,20 @@ export function MenuClient({ categories, dishes }: Props) {
       .map(([dishId, quantity]) => ({ dishId, quantity }));
 
     startTransition(async () => {
+      if (orderId) {
+        const result = await addOrderItems(orderId, { items });
+        if (!result.ok) {
+          setMessage(result.error);
+          return;
+        }
+        setCart({});
+        sessionStorage.removeItem(CART_STORAGE_KEY);
+        setMessage(`加菜成功，待付 ¥${result.addedAmount.toFixed(2)}`);
+        router.push(`/orders/${orderId}`);
+        router.refresh();
+        return;
+      }
+
       const result = await createOrder({ items });
       if (!result.ok) {
         setMessage(result.error);
@@ -178,7 +200,7 @@ export function MenuClient({ categories, dishes }: Props) {
       setCart({});
       sessionStorage.removeItem(CART_STORAGE_KEY);
       setMessage(`下单成功，合计 ¥${result.totalAmount.toFixed(2)}`);
-      router.push("/orders");
+      router.push(`/orders/${result.orderId}`);
       router.refresh();
     });
   }
@@ -194,12 +216,19 @@ export function MenuClient({ categories, dishes }: Props) {
   return (
     <div className="flex h-full min-h-0 flex-col overflow-hidden">
       <header className="shrink-0 border-b border-line bg-[#fffaf2] px-4 pb-3 pt-[max(0.75rem,env(safe-area-inset-top))]">
-        <div className="mb-3 flex items-center justify-between">
-          <h1 className="font-display text-xl">点菜</h1>
+        <div className="relative mb-3 flex min-h-8 items-center justify-center">
+          {isAddMode && orderId ? (
+            <div className="absolute left-0 top-1/2 z-10 -translate-y-1/2">
+              <BackLink href={`/orders/${orderId}`} />
+            </div>
+          ) : null}
+          <h1 className="font-display text-xl">
+            {isAddMode ? "加菜" : "点菜"}
+          </h1>
           <button
             type="button"
             onClick={onRefresh}
-            className="inline-flex items-center gap-1 text-sm text-brand-deep"
+            className="absolute right-0 top-1/2 z-10 inline-flex -translate-y-1/2 items-center gap-1 text-sm text-brand-deep"
             disabled={pending}
           >
             <RefreshCw size={ICON_SIZE.sm} strokeWidth={2} aria-hidden />
@@ -347,7 +376,7 @@ export function MenuClient({ categories, dishes }: Props) {
       </div>
 
       <div
-        className={`fixed ${CART_BOTTOM} left-1/2 z-30 w-full max-w-md -translate-x-1/2 px-3`}
+        className={`fixed ${isAddMode ? CART_BOTTOM_PLAIN : CART_BOTTOM_TAB} left-1/2 z-30 w-full max-w-md -translate-x-1/2 px-3`}
       >
         <div className="flex items-center gap-3 rounded-2xl bg-[#2b2118] px-3 py-2.5 text-white shadow-lg">
           <div className="relative flex h-11 w-11 items-center justify-center rounded-full bg-brand text-[#3b2a00]">
@@ -368,7 +397,11 @@ export function MenuClient({ categories, dishes }: Props) {
             onClick={onCheckout}
             className="rounded-xl bg-brand px-4 py-2.5 text-sm font-semibold text-[#3b2a00] disabled:opacity-40"
           >
-            {pending ? "提交中…" : "去结算"}
+            {pending
+              ? "提交中…"
+              : isAddMode
+                ? "确认加菜"
+                : "去结算"}
           </button>
         </div>
       </div>

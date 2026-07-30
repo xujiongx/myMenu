@@ -55,9 +55,10 @@ create table if not exists public.orders (
   id uuid primary key default gen_random_uuid(),
   user_id uuid not null references public.profiles (id) on delete restrict,
   total_amount numeric(12, 2) not null check (total_amount >= 0),
-  status text not null default 'confirmed'
+  status text not null default 'pending'
     check (status in ('pending', 'confirmed', 'cancelled', 'completed')),
   remark text,
+  payable_amount numeric(12, 2) not null default 0 check (payable_amount >= 0),
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
 );
@@ -73,7 +74,8 @@ create table if not exists public.order_items (
   dish_image_url text,
   unit_price numeric(10, 2) not null,
   quantity int not null check (quantity > 0),
-  line_amount numeric(12, 2) not null
+  line_amount numeric(12, 2) not null,
+  paid boolean not null default false
 );
 
 create index if not exists idx_order_items_order

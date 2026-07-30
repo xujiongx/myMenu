@@ -1,8 +1,8 @@
-# 我的菜单（Next.js 移动端 + Supabase + ImgBB）
+# 小菜单（Next.js 移动端 + Supabase + ImgBB）
 
 轻量移动端点菜：账号登录、分类浏览、加购结算、点菜记录、管理员维护菜品（图片经 ImgBB）。
 
-UI 风格对齐 `docs` 设计图：黄色品牌色、餐罩 LOGO、左右分类点菜、底部双 Tab。
+UI：黄色品牌色、`logo.ico` 站标、左右分类点菜、底部双 Tab；「添加到主屏幕」名称为 **小菜单**。
 
 ## 技术栈
 
@@ -53,6 +53,7 @@ npm run dev
 | `/mine` | 我的 |
 | `/orders` | 点菜记录 |
 | `/orders/[id]` | 订单详情 |
+| `/orders/[id]/add` | 订单加菜 |
 | `/manage` | 我的菜单（菜品管理） |
 | `/manage/dish` | 新增/编辑菜品 |
 | `/categories` | 分类管理 |
@@ -66,6 +67,8 @@ npm run dev
 - 新库：执行 `supabase/migrations/001_init.sql`
 - 已跑过旧版全局菜单：再执行 `002_per_user_menu.sql`
 - 已有库且 admin 角色为 user：再执行 `003_admin_role.sql`
+- 订单待支付金额：再执行 `004_order_payable.sql`
+- 订单明细已付标记：再执行 `005_order_item_paid.sql`
 
 生产部署后可配置 `.github/workflows/keep-alive.yml`（见 [部署文档](./docs/deployment.md) §8）。
 

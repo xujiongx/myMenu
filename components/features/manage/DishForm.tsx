@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
 import { ImageIcon } from "lucide-react";
 import { createDish, updateDish } from "@/app/actions/dish-admin";
-import { BackLink } from "@/components/common/BackLink";
+import { PageHeader } from "@/components/common/PageHeader";
 import { ICON_SIZE } from "@/lib/constants/icon-size";
 import type { Category, Dish, DishStatus } from "@/lib/types";
 
@@ -78,23 +78,21 @@ export function DishForm({
   }
 
   return (
-    <div className="min-h-dvh pb-8">
-      <header className="sticky top-0 z-10 flex items-center justify-between border-b border-line bg-[#fffaf2]/95 px-4 py-3 pt-[max(0.75rem,env(safe-area-inset-top))] backdrop-blur">
-        <div className="flex items-center gap-3">
-          <BackLink href="/manage" />
-          <h1 className="font-display text-xl">
-            {dish ? "编辑菜品" : "新增菜品"}
-          </h1>
-        </div>
-        <button
-          type="submit"
-          form="dish-form"
-          disabled={pending || uploading}
-          className="text-sm font-semibold text-brand-deep"
-        >
-          {pending ? "保存中…" : "保存"}
-        </button>
-      </header>
+    <div className="min-h-full pb-8">
+      <PageHeader
+        backHref="/manage"
+        title={dish ? "编辑菜品" : "新增菜品"}
+        right={
+          <button
+            type="submit"
+            form="dish-form"
+            disabled={pending || uploading}
+            className="text-sm font-semibold text-brand-deep"
+          >
+            {pending ? "保存中…" : "保存"}
+          </button>
+        }
+      />
 
       <form id="dish-form" onSubmit={onSubmit} className="space-y-4 px-4 py-4">
         <label className="block">

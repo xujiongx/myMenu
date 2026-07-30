@@ -26,7 +26,9 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         className={[
           "min-h-0 flex-1",
           hideTab
-            ? "overflow-y-auto"
+            ? pathname.startsWith("/orders/") && pathname.endsWith("/add")
+              ? "overflow-hidden"
+              : "overflow-y-auto"
             : isOrderPage
               ? "overflow-hidden pb-[calc(3.75rem+env(safe-area-inset-bottom))]"
               : "overflow-y-auto pb-[calc(3.75rem+env(safe-area-inset-bottom))]",
@@ -51,7 +53,11 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                     active ? "text-brand-deep" : "text-muted"
                   }`}
                 >
-                  <TabIcon size={ICON_SIZE.tab} strokeWidth={active ? 2.25 : 1.9} aria-hidden />
+                  <TabIcon
+                    size={ICON_SIZE.tab}
+                    strokeWidth={active ? 2.25 : 1.9}
+                    aria-hidden
+                  />
                   <span className={active ? "font-semibold" : ""}>
                     {tab.label}
                   </span>

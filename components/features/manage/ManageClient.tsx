@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
 import { ImageIcon, Pencil, Plus, Trash2 } from "lucide-react";
 import { deleteDishes } from "@/app/actions/dish-admin";
-import { BackLink } from "@/components/common/BackLink";
+import { PageHeader } from "@/components/common/PageHeader";
 import { ICON_SIZE } from "@/lib/constants/icon-size";
 import type { Category, Dish } from "@/lib/types";
 
@@ -51,23 +51,23 @@ export function ManageClient({
   }
 
   return (
-    <div className="min-h-dvh pb-24">
-      <header className="sticky top-0 z-10 flex items-center justify-between border-b border-line bg-[#fffaf2]/95 px-4 py-3 pt-[max(0.75rem,env(safe-area-inset-top))] backdrop-blur">
-        <div className="flex items-center gap-3">
-          <BackLink href="/mine" />
-          <h1 className="font-display text-xl">我的菜单</h1>
-        </div>
-        {selected.size > 0 ? (
-          <button
-            type="button"
-            onClick={() => setConfirmIds([...selected])}
-            className="inline-flex items-center gap-1 text-sm text-danger"
-          >
-            <Trash2 size={ICON_SIZE.sm} strokeWidth={2} aria-hidden />
-            批量删除
-          </button>
-        ) : null}
-      </header>
+    <div className="min-h-full pb-24">
+      <PageHeader
+        backHref="/mine"
+        title="我的菜单"
+        right={
+          selected.size > 0 ? (
+            <button
+              type="button"
+              onClick={() => setConfirmIds([...selected])}
+              className="inline-flex items-center gap-1 text-sm text-danger"
+            >
+              <Trash2 size={ICON_SIZE.sm} strokeWidth={2} aria-hidden />
+              批量删除
+            </button>
+          ) : null
+        }
+      />
 
       <div className="space-y-3 px-4 py-4">
         {dishes.length === 0 ? (

@@ -43,7 +43,14 @@ erDiagram
 
 ### 3.3 `orders` / `order_items`
 
-订单按 `user_id` 隔离；明细保留下单快照。
+| 字段 | 说明 |
+|------|------|
+| status | `pending` 待支付 → `confirmed` 已确认 → `completed` 已完成（可取消） |
+| total_amount | 订单累计金额（含历次加菜） |
+| payable_amount | 当前待支付金额；首次下单=全额；已确认后加菜=仅加菜金额；支付后归零 |
+| order_items.paid | 明细是否已付；未付可移除；有已付明细时不可整单取消 |
+
+订单按 `user_id` 隔离；明细保留下单快照。迁移：`004_order_payable.sql`、`005_order_item_paid.sql`。
 
 ## 4. 种子账号
 
@@ -63,3 +70,5 @@ erDiagram
 | 2026-07-28 | 初版 |
 | 2026-07-28 | **每用户独立菜单**：categories/dishes 增加 `user_id` |
 | 2026-07-28 | admin 种子角色恢复为 `admin`；迁移 `003_admin_role.sql` |
+| 2026-07-30 | 订单 `payable_amount`；待支付 / 加菜 / 去支付流程 |
+| 2026-07-30 | `order_items.paid`；取消订单 / 移除未付加菜 |

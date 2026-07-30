@@ -1,6 +1,6 @@
 # 开发指南
 
-> 项目：我的菜单（Next.js 移动端点菜 + Supabase + ImgBB）· 更新日期：2026-07-28
+> 项目：小菜单（Next.js 移动端点菜 + Supabase + ImgBB）· 更新日期：2026-07-30
 
 ## 1. 环境要求
 
@@ -34,10 +34,11 @@ flowchart LR
 ```
 
 - **会话**：自定义账号密码（`profiles`）+ httpOnly JWT Cookie（`menu_session`）；中间件保护业务路由。
+- **品牌 / PWA**：`lib/constants/branding.ts`（`APP_DISPLAY_NAME=小菜单`）；`app/manifest.ts`；图标维护 `app/logo.ico`（同步 `app/icon.ico`、`public/logo.ico`），元数据与 `AppLogo` 使用 `/logo.ico`。
 - **菜单 / 订单**：Server Actions 读写；菜单读走 `unstable_cache`（标签 `menu`）。
 - **图片**：客户端选图 → `POST /api/upload` → ImgBB → URL 写入菜品。
-- **购物车**：仅客户端 `sessionStorage`，结算时 `createOrder`。
-- **布局**：移动端 `max-w-md`；底部双 Tab「点菜 / 我的」；品牌黄对齐设计图。二级页（`/manage`、`/categories`、`/orders`、`/users`、`/login`）隐藏底栏。
+- **购物车**：仅客户端 `sessionStorage`；结算 `createOrder`（待支付）；加菜 `addOrderItems`。
+- **布局**：移动端 `max-w-md`；底部双 Tab「点菜 / 我的」；品牌黄对齐设计图。二级页（`/manage`、`/categories`、`/orders`、`/users`、`/login`、加菜 `/orders/[id]/add`）隐藏底栏；二级页顶栏 `PageHeader` 标题居中。
 
 详见 [database-design.md](./database-design.md)、[api.md](./api.md)、[cache-design.md](./cache-design.md)。
 
@@ -50,10 +51,12 @@ flowchart LR
 │   ├── actions/
 │   │   ├── auth.ts               # 登录 / 登出 / 当前用户 / requireAdmin
 │   │   ├── menu.ts               # 分类、菜品读取、菜单缓存刷新
-│   │   ├── order.ts              # 下单、订单列表/详情
+│   │   ├── order.ts              # 下单/加菜/支付/完成、列表与详情
 │   │   ├── dish-admin.ts         # 菜品 CRUD（本人）
 │   │   ├── category.ts           # 分类 CRUD（本人）
 │   │   └── user-admin.ts         # 用户 CRUD（仅 admin）
+│   ├── manifest.ts               # PWA Web App Manifest
+│   ├── logo.ico / icon.ico       # 应用图标源（与 public/logo.ico 同步）
 │   ├── api/upload/route.ts       # ImgBB 上传
 │   ├── api/health/route.ts       # 健康检查 / Supabase 保活
 │   ├── login/page.tsx
@@ -67,7 +70,7 @@ flowchart LR
 │   ├── users/                    # 用户管理（仅 admin）
 │   └── layout.tsx                # 壳层、Tab、metadata
 ├── components/
-│   ├── common/                   # TabBar、Loading、空态等
+│   ├── common/                   # AppShell、AppLogo、PageHeader 等
 │   └── features/
 │       ├── auth/
 │       ├── menu/                 # 分类栏、菜品卡、购物车栏

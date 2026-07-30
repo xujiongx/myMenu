@@ -7,7 +7,7 @@ import {
   updateUser,
   type ManagedUser,
 } from "@/app/actions/user-admin";
-import { BackLink } from "@/components/common/BackLink";
+import { PageHeader } from "@/components/common/PageHeader";
 
 export function UserForm({ user }: { user: ManagedUser | null }) {
   const router = useRouter();
@@ -37,23 +37,21 @@ export function UserForm({ user }: { user: ManagedUser | null }) {
   }
 
   return (
-    <div className="min-h-dvh pb-8">
-      <header className="sticky top-0 z-10 flex items-center justify-between border-b border-line bg-[#fffaf2]/95 px-4 py-3 pt-[max(0.75rem,env(safe-area-inset-top))] backdrop-blur">
-        <div className="flex items-center gap-3">
-          <BackLink href="/users" />
-          <h1 className="font-display text-xl">
-            {user ? "编辑用户" : "新增用户"}
-          </h1>
-        </div>
-        <button
-          type="submit"
-          form="user-form"
-          disabled={pending}
-          className="text-sm font-semibold text-brand-deep"
-        >
-          {pending ? "保存中…" : "保存"}
-        </button>
-      </header>
+    <div className="min-h-full pb-8">
+      <PageHeader
+        backHref="/users"
+        title={user ? "编辑用户" : "新增用户"}
+        right={
+          <button
+            type="submit"
+            form="user-form"
+            disabled={pending}
+            className="text-sm font-semibold text-brand-deep"
+          >
+            {pending ? "保存中…" : "保存"}
+          </button>
+        }
+      />
 
       <form
         id="user-form"

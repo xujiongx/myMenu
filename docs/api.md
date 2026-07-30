@@ -35,9 +35,15 @@
 - **不可编辑 / 删除**账号 `admin` 或 `role=admin` 的用户；不可新建账号名 `admin`；新建用户固定 `role=user`。
 - 删除用户前先删其订单，再删 profile（分类/菜品 CASCADE）。
 
-## 5. 下单
+## 5. 下单与支付
 
-- `createOrder` 只接受当前用户自己的上架菜品 ID。
+- `createOrder`：状态 `pending`，`payable_amount = total_amount`。
+- `payOrder`：仅 `pending` → `confirmed`，未付明细标为已付，`payable_amount = 0`。
+- `addOrderItems`：`pending`/`confirmed` 可加菜；已确认加菜后回到 `pending`，`payable_amount` 仅为本次加菜金额；新明细 `paid=false`。
+- `cancelOrder`：仅待支付且**无已付明细**时可取消 → `cancelled`。
+- `removeUnpaidOrderItem`：待支付下移除未付明细；全部移除则删单；未付清零且仍有已付 → 回 `confirmed`。
+- `completeOrder`：仅 `confirmed` → `completed`。
+- 加菜入口：`/orders/[id]/add`（二级页，无底栏）。
 
 ## 6. 变更记录
 
@@ -48,3 +54,5 @@
 | 2026-07-28 | 新增分类管理 CRUD |
 | 2026-07-28 | 管理员用户管理 CRUD（保护 admin） |
 | 2026-07-30 | `/api/health` + GitHub Actions keep-alive |
+| 2026-07-30 | 订单待支付 / 加菜 / 去支付 / 已完成 |
+| 2026-07-30 | 取消订单 / 移除未付明细（`paid`） |
