@@ -281,6 +281,7 @@ export function MenuClient({ categories, dishes, orderId }: Props) {
                   categoryBtnRefs.current[cat.id] = node;
                 }}
                 onClick={() => onCategoryClick(cat.id)}
+                data-no-tap
                 className={`relative block w-full px-2 py-3.5 text-center text-xs leading-tight transition ${
                   active
                     ? "bg-card font-semibold text-brand-deep"
@@ -371,7 +372,7 @@ export function MenuClient({ categories, dishes, orderId }: Props) {
                                     <button
                                       type="button"
                                       onClick={() => updateQty(dish.id, -1)}
-                                      className="flex h-7 w-7 items-center justify-center rounded-full border border-line text-muted"
+                                      className="tap-icon flex h-7 w-7 items-center justify-center rounded-full border border-line text-muted"
                                       aria-label="减少"
                                     >
                                       <Minus size={ICON_SIZE.sm} strokeWidth={2.25} aria-hidden />
@@ -384,7 +385,7 @@ export function MenuClient({ categories, dishes, orderId }: Props) {
                                 <button
                                   type="button"
                                   onClick={() => updateQty(dish.id, 1)}
-                                  className="flex h-7 w-7 items-center justify-center rounded-full bg-brand text-[#3b2a00]"
+                                  className="tap-icon flex h-7 w-7 items-center justify-center rounded-full bg-brand text-[#3b2a00]"
                                   aria-label="增加"
                                 >
                                   <Plus size={ICON_SIZE.sm} strokeWidth={2.25} aria-hidden />
@@ -423,7 +424,7 @@ export function MenuClient({ categories, dishes, orderId }: Props) {
             type="button"
             disabled={pending || totalQty === 0}
             onClick={onCheckout}
-            className="rounded-xl bg-brand px-4 py-2.5 text-sm font-semibold text-[#3b2a00] disabled:opacity-40"
+            className="tap-primary rounded-xl bg-brand px-4 py-2.5 text-sm font-semibold text-[#3b2a00] disabled:opacity-40"
           >
             {pending
               ? "提交中…"

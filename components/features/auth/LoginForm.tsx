@@ -127,7 +127,7 @@ export function LoginForm() {
         <button
           type="submit"
           disabled={pending}
-          className="mt-2 w-full rounded-2xl bg-brand py-3.5 text-base font-semibold text-[#3b2a00] shadow-[0_8px_20px_rgba(240,180,41,0.35)] transition active:scale-[0.99] disabled:opacity-60"
+          className="tap-primary mt-2 w-full rounded-2xl bg-brand py-3.5 text-base font-semibold text-[#3b2a00] shadow-[0_8px_20px_rgba(240,180,41,0.35)] disabled:opacity-60"
         >
           {pending ? "登录中…" : "登录"}
         </button>

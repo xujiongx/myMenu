@@ -51,7 +51,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                 <Link
                   key={tab.href}
                   href={tab.href}
-                  className={`flex flex-col items-center gap-0.5 py-2 text-xs transition ${
+                  className={`flex flex-col items-center gap-0.5 rounded-xl py-2 text-xs ${
                     active ? "text-brand-deep" : "text-muted"
                   }`}
                 >

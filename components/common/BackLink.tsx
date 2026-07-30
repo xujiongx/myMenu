@@ -12,7 +12,7 @@ export function BackLink({
   return (
     <Link
       href={href}
-      className="inline-flex items-center gap-0.5 text-sm text-muted"
+      className="inline-flex items-center gap-0.5 rounded-lg text-sm text-muted"
     >
       <ChevronLeft size={ICON_SIZE.md} strokeWidth={2} aria-hidden />
       {label}

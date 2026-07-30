@@ -214,7 +214,7 @@ export function ImagePreviewHost({
         <button
           type="button"
           onClick={onClose}
-          className="flex h-9 w-9 items-center justify-center rounded-full bg-white/15 text-white"
+          className="tap-icon flex h-9 w-9 items-center justify-center rounded-full bg-white/15 text-white"
           aria-label="关闭"
         >
           <X size={ICON_SIZE.close} strokeWidth={2.25} aria-hidden />
@@ -231,7 +231,7 @@ export function ImagePreviewHost({
         {multi ? (
           <button
             type="button"
-            className="absolute left-2 z-10 flex h-10 w-10 items-center justify-center rounded-full bg-white/15 text-white"
+            className="tap-icon absolute left-2 z-10 flex h-10 w-10 items-center justify-center rounded-full bg-white/15 text-white"
             aria-label="上一张"
             onClick={(e) => {
               e.stopPropagation();
@@ -268,7 +268,7 @@ export function ImagePreviewHost({
         {multi ? (
           <button
             type="button"
-            className="absolute right-2 z-10 flex h-10 w-10 items-center justify-center rounded-full bg-white/15 text-white"
+            className="tap-icon absolute right-2 z-10 flex h-10 w-10 items-center justify-center rounded-full bg-white/15 text-white"
             aria-label="下一张"
             onClick={(e) => {
               e.stopPropagation();
@@ -303,7 +303,7 @@ export function ImagePreviewHost({
         <div className="flex items-center gap-2 rounded-full bg-white/15 px-2 py-1.5 backdrop-blur-sm">
           <button
             type="button"
-            className="flex h-9 w-9 items-center justify-center rounded-full text-white disabled:opacity-35"
+            className="tap-icon flex h-9 w-9 items-center justify-center rounded-full text-white disabled:opacity-35"
             aria-label="缩小"
             disabled={scale <= MIN_SCALE}
             onClick={() => zoomBy(-SCALE_STEP)}
@@ -312,7 +312,7 @@ export function ImagePreviewHost({
           </button>
           <button
             type="button"
-            className="flex h-9 w-9 items-center justify-center rounded-full text-white disabled:opacity-35"
+            className="tap-icon flex h-9 w-9 items-center justify-center rounded-full text-white disabled:opacity-35"
             aria-label="放大"
             disabled={scale >= MAX_SCALE}
             onClick={() => zoomBy(SCALE_STEP)}
@@ -321,7 +321,7 @@ export function ImagePreviewHost({
           </button>
           <button
             type="button"
-            className="flex h-9 w-9 items-center justify-center rounded-full text-white"
+            className="tap-icon flex h-9 w-9 items-center justify-center rounded-full text-white"
             aria-label="向左旋转"
             onClick={() => setRotation((r) => r - 90)}
           >
@@ -329,7 +329,7 @@ export function ImagePreviewHost({
           </button>
           <button
             type="button"
-            className="flex h-9 w-9 items-center justify-center rounded-full text-white"
+            className="tap-icon flex h-9 w-9 items-center justify-center rounded-full text-white"
             aria-label="向右旋转"
             onClick={() => setRotation((r) => r + 90)}
           >

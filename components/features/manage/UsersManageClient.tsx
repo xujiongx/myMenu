@@ -99,7 +99,7 @@ export function UsersManageClient({ users: initial }: { users: ManagedUser[] }) 
       <div className="fixed bottom-0 left-1/2 z-20 w-full max-w-md -translate-x-1/2 border-t border-line bg-card p-4 pb-[max(1rem,env(safe-area-inset-bottom))]">
         <Link
           href="/users/form"
-          className="flex items-center justify-center gap-1.5 rounded-2xl bg-brand py-3 text-center font-semibold text-[#3b2a00]"
+          className="tap-primary flex items-center justify-center gap-1.5 rounded-2xl bg-brand py-3 text-center font-semibold text-[#3b2a00]"
         >
           <Plus size={ICON_SIZE.md} strokeWidth={2.25} aria-hidden />
           新增用户

@@ -40,6 +40,7 @@ flowchart LR
 - **购物车**：仅客户端 `sessionStorage`；结算 `createOrder`（待支付）；加菜 `addOrderItems`。
 - **布局**：移动端 `max-w-md`；底部双 Tab「点菜 / 我的」；品牌黄对齐设计图。二级页（`/manage`、`/categories`、`/orders`、`/users`、`/login`、加菜 `/orders/[id]/add`）隐藏底栏；二级页顶栏 `PageHeader` 标题居中。
 - **首屏**：`BootSplash` 品牌加载壳 + `html/body` 底色；点菜页先出菜单，已点次数客户端延后拉取；PWA 预缓存 `/login`、图标与 manifest。
+- **点击反馈**：`app/globals.css` 为 `button` / `a` / `[data-tap]` / `[role="button"]` 提供按压缩放与透明度；主按钮加 `tap-primary`，圆形加减/工具栏加 `tap-icon`；整行列表等大块点击区用 `data-no-tap`（仅背景高亮，避免整行缩放）。尊重 `prefers-reduced-motion`。
 
 详见 [database-design.md](./database-design.md)、[api.md](./api.md)、[cache-design.md](./cache-design.md)。
 

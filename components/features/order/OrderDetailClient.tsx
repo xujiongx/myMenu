@@ -201,7 +201,7 @@ export function OrderDetailClient({ order }: { order: OrderDetail }) {
                 type="button"
                 disabled={pending}
                 onClick={onPay}
-                className="rounded-2xl bg-brand py-3 text-sm font-semibold text-[#3b2a00]"
+                className="tap-primary rounded-2xl bg-brand py-3 text-sm font-semibold text-[#3b2a00]"
               >
                 {pending ? "处理中…" : "去支付"}
               </button>
@@ -211,7 +211,7 @@ export function OrderDetailClient({ order }: { order: OrderDetail }) {
                 type="button"
                 disabled={pending}
                 onClick={onComplete}
-                className="rounded-2xl bg-brand py-3 text-sm font-semibold text-[#3b2a00]"
+                className="tap-primary rounded-2xl bg-brand py-3 text-sm font-semibold text-[#3b2a00]"
               >
                 {pending ? "处理中…" : "已完成"}
               </button>

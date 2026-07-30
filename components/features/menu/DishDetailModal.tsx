@@ -46,7 +46,7 @@ export function DishDetailModal({
           <button
             type="button"
             onClick={onClose}
-            className="absolute top-3 right-3 z-10 flex h-8 w-8 items-center justify-center rounded-full bg-black/45 text-white"
+            className="tap-icon absolute top-3 right-3 z-10 flex h-8 w-8 items-center justify-center rounded-full bg-black/45 text-white"
             aria-label="关闭"
           >
             <X size={ICON_SIZE.close} strokeWidth={2.25} aria-hidden />
@@ -78,7 +78,7 @@ export function DishDetailModal({
                 type="button"
                 onClick={() => onChangeQty(-1)}
                 disabled={quantity <= 0}
-                className="flex h-9 w-9 items-center justify-center rounded-full border border-line text-muted disabled:opacity-30"
+                className="tap-icon flex h-9 w-9 items-center justify-center rounded-full border border-line text-muted disabled:opacity-30"
                 aria-label="减少"
               >
                 <Minus size={ICON_SIZE.md} strokeWidth={2.25} aria-hidden />
@@ -89,7 +89,7 @@ export function DishDetailModal({
               <button
                 type="button"
                 onClick={() => onChangeQty(1)}
-                className="flex h-9 w-9 items-center justify-center rounded-full bg-brand text-[#3b2a00]"
+                className="tap-icon flex h-9 w-9 items-center justify-center rounded-full bg-brand text-[#3b2a00]"
                 aria-label="增加"
               >
                 <Plus size={ICON_SIZE.md} strokeWidth={2.25} aria-hidden />
@@ -101,7 +101,7 @@ export function DishDetailModal({
                 if (quantity <= 0) onChangeQty(1);
                 onClose();
               }}
-              className="rounded-2xl bg-brand px-5 py-2.5 text-sm font-semibold text-[#3b2a00]"
+              className="tap-primary rounded-2xl bg-brand px-5 py-2.5 text-sm font-semibold text-[#3b2a00]"
             >
               {quantity > 0 ? "选好了" : "加入购物车"}
             </button>

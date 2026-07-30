@@ -58,6 +58,7 @@ export function MineClient({ user }: { user: Profile }) {
           <Link
             href="/orders"
             className="flex items-center justify-between px-4 py-4 text-sm active:bg-[#faf7f2]"
+            data-no-tap
           >
             <span className="inline-flex items-center gap-2">
               <ShoppingBag
@@ -78,6 +79,7 @@ export function MineClient({ user }: { user: Profile }) {
           <Link
             href="/stats"
             className="flex items-center justify-between border-t border-line px-4 py-4 text-sm active:bg-[#faf7f2]"
+            data-no-tap
           >
             <span className="inline-flex items-center gap-2">
               <BarChart3
@@ -99,6 +101,7 @@ export function MineClient({ user }: { user: Profile }) {
             type="button"
             onClick={() => router.push("/categories")}
             className="flex w-full items-center justify-between border-t border-line px-4 py-4 text-left text-sm active:bg-[#faf7f2]"
+            data-no-tap
           >
             <span className="inline-flex items-center gap-2">
               <FolderTree
@@ -120,6 +123,7 @@ export function MineClient({ user }: { user: Profile }) {
             type="button"
             onClick={() => router.push("/manage")}
             className="flex w-full items-center justify-between border-t border-line px-4 py-4 text-left text-sm active:bg-[#faf7f2]"
+            data-no-tap
           >
             <span className="inline-flex items-center gap-2">
               <Pencil
@@ -142,6 +146,7 @@ export function MineClient({ user }: { user: Profile }) {
               type="button"
               onClick={() => router.push("/users")}
               className="flex w-full items-center justify-between border-t border-line px-4 py-4 text-left text-sm active:bg-[#faf7f2]"
+              data-no-tap
             >
               <span className="inline-flex items-center gap-2">
                 <Users
@@ -164,6 +169,7 @@ export function MineClient({ user }: { user: Profile }) {
             type="button"
             onClick={() => setConfirmSwitch(true)}
             className="flex w-full items-center justify-between border-t border-line px-4 py-4 text-left text-sm active:bg-[#faf7f2]"
+            data-no-tap
           >
             <span className="inline-flex items-center gap-2">
               <User
@@ -201,7 +207,7 @@ export function MineClient({ user }: { user: Profile }) {
               <button
                 type="button"
                 onClick={onConfirmSwitch}
-                className="rounded-xl bg-brand py-2.5 text-sm font-semibold text-[#3b2a00]"
+                className="rounded-xl bg-brand py-2.5 text-sm font-semibold text-[#3b2a00] tap-primary"
               >
                 {pending ? "退出中…" : "确定"}
               </button>

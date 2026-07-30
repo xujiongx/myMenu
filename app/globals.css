@@ -52,6 +52,78 @@ body {
   font-family: var(--font-app-display), "Songti SC", "Noto Serif SC", serif;
 }
 
+/* —— 全局点击反馈 —— */
+button,
+a,
+[data-tap],
+[role="button"] {
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+
+button:not(:disabled):not([data-no-tap]),
+a:not([data-no-tap]),
+[data-tap]:not([aria-disabled="true"]),
+[role="button"]:not([aria-disabled="true"]):not([data-no-tap]) {
+  transition:
+    scale 0.14s cubic-bezier(0.22, 1, 0.36, 1),
+    opacity 0.14s ease,
+    filter 0.14s ease,
+    background-color 0.15s ease,
+    box-shadow 0.15s ease,
+    color 0.15s ease,
+    border-color 0.15s ease;
+}
+
+button:not(:disabled):not([data-no-tap]):active,
+a:not([data-no-tap]):active,
+[data-tap]:not([aria-disabled="true"]):active,
+[role="button"]:not([aria-disabled="true"]):not([data-no-tap]):active {
+  /* 用 scale 属性，避免覆盖 Tailwind 的 transform/translate */
+  scale: 0.97;
+  opacity: 0.88;
+}
+
+/* 圆形加减等小图标按钮：按压更明显 */
+button.tap-icon:not(:disabled):active,
+[data-tap="icon"]:active {
+  scale: 0.88;
+  opacity: 0.85;
+}
+
+/* 主操作按钮：按压缩放 + 略压阴影 */
+button.tap-primary:not(:disabled):active,
+a.tap-primary:active {
+  scale: 0.98;
+  opacity: 0.92;
+  filter: brightness(0.97);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  button:not(:disabled):not([data-no-tap]):hover,
+  a:not([data-no-tap]):hover,
+  [data-tap]:not([aria-disabled="true"]):hover {
+    filter: brightness(0.985);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  button:not(:disabled):not([data-no-tap]),
+  a:not([data-no-tap]),
+  [data-tap],
+  [role="button"] {
+    transition: none !important;
+  }
+
+  button:not(:disabled):not([data-no-tap]):active,
+  a:not([data-no-tap]):active,
+  [data-tap]:active,
+  [role="button"]:active {
+    scale: none;
+    opacity: 0.75;
+  }
+}
+
 @keyframes dish-sheet-in {
   from {
     transform: translateY(18px);
@@ -80,4 +152,3 @@ body {
   width: 16px;
   border-radius: 999px;
 }
-
