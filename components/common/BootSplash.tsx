@@ -25,8 +25,8 @@ export function BootSplash({
       aria-live="polite"
       aria-label={label}
     >
-      <div className="animate-pulse rounded-3xl shadow-[0_12px_40px_rgba(240,180,41,0.28)]">
-        <AppLogo size={72} alt="" />
+      <div className="animate-pulse overflow-hidden rounded-[22%] shadow-[0_12px_40px_rgba(240,180,41,0.28)]">
+        <AppLogo size={72} alt="" className="rounded-[22%]" />
       </div>
       <p className="font-display text-xl tracking-wide text-[#3b2a00]">
         {APP_DISPLAY_NAME}
