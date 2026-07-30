@@ -3,7 +3,9 @@
  *
  * - 名称：改下面三个常量即可；`app/layout.tsx` 与 `app/manifest.ts` 已引用。
  * - 图标：维护 **`app/logo.ico`**（并同步 `app/icon.ico`、`public/logo.ico`）；
- *   favicon / iOS 主屏幕 / manifest / AppLogo 均使用 `/logo.ico`。换图后若主屏幕仍旧，请删图标重新添加。
+ *   AppLogo / favicon 用 `/logo.ico`；PWA 安装图标用 `public/icons/icon-{192,512}.png`。
+ *   换图后请同步导出 PNG，并让用户删主屏幕图标后重加。
+ * - PWA：`@serwist/turbopack` Service Worker（生产注册）；离线回退 `/~offline`。
  */
 export const APP_DISPLAY_NAME = "小菜单";
 

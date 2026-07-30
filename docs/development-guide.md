@@ -34,7 +34,7 @@ flowchart LR
 ```
 
 - **会话**：自定义账号密码（`profiles`）+ httpOnly JWT Cookie（`menu_session`）；中间件保护业务路由。
-- **品牌 / PWA**：`lib/constants/branding.ts`（`APP_DISPLAY_NAME=小菜单`）；`app/manifest.ts`；图标维护 `app/logo.ico`（同步 `app/icon.ico`、`public/logo.ico`），元数据与 `AppLogo` 使用 `/logo.ico`。
+- **品牌 / PWA**：`lib/constants/branding.ts`（`APP_DISPLAY_NAME=小菜单`）；`app/manifest.ts`；图标维护 `app/logo.ico`（同步 `app/icon.ico`、`public/logo.ico`）+ `public/icons/icon-{192,512}.png`；生产环境经 `@serwist/turbopack` 注册 Service Worker（`/serwist/sw.js`），预缓存壳层与静态资源，导航缓存已访问页，离线回退 `/~offline`。
 - **菜单 / 订单**：Server Actions 读写；菜单读走 `unstable_cache`（标签 `menu`）。
 - **图片**：客户端选图 → `POST /api/upload` → ImgBB → URL 写入菜品。
 - **购物车**：仅客户端 `sessionStorage`；结算 `createOrder`（待支付）；加菜 `addOrderItems`。
@@ -56,6 +56,9 @@ flowchart LR
 │   │   ├── category.ts           # 分类 CRUD（本人）
 │   │   └── user-admin.ts         # 用户 CRUD（仅 admin）
 │   ├── manifest.ts               # PWA Web App Manifest
+│   ├── sw.ts                     # Service Worker 源（Serwist）
+│   ├── serwist/[path]/route.ts   # 构建并提供 /serwist/sw.js
+│   ├── ~offline/page.tsx         # 离线回退页
 │   ├── logo.ico / icon.ico       # 应用图标源（与 public/logo.ico 同步）
 │   ├── api/upload/route.ts       # ImgBB 上传
 │   ├── api/health/route.ts       # 健康检查 / Supabase 保活
@@ -68,9 +71,9 @@ flowchart LR
 │   │   └── dish/page.tsx         # 新增/编辑（可用 query id）
 │   ├── categories/               # 分类管理
 │   ├── users/                    # 用户管理（仅 admin）
-│   └── layout.tsx                # 壳层、Tab、metadata
+│   └── layout.tsx                # 壳层、Tab、metadata、PWA 注册
 ├── components/
-│   ├── common/                   # AppShell、AppLogo、PageHeader 等
+│   ├── common/                   # AppShell、AppLogo、PwaProvider、PageHeader 等
 │   └── features/
 │       ├── auth/
 │       ├── menu/                 # 分类栏、菜品卡、购物车栏
@@ -79,6 +82,9 @@ flowchart LR
 ├── lib/
 │   ├── supabase/                 # server / client / middleware 客户端
 │   └── constants/                # 品牌文案、限制（上传大小等）
+├── public/
+│   ├── logo.ico
+│   └── icons/                    # PWA 安装图标 192 / 512
 ├── supabase/migrations/          # SQL 迁移
 ├── docs/                         # 本目录
 ├── .env.example
@@ -103,9 +109,9 @@ flowchart LR
 
 ```bash
 npm install
-npm run dev          # http://localhost:3000
+npm run dev          # http://localhost:3000（开发不注册 SW）
 npm run build
-npm run start
+npm run start        # 生产预览；可用「添加到主屏幕」验证 PWA
 ```
 
 ## 6. 开发约定
@@ -118,16 +124,19 @@ npm run start
 
 ## 7. UI / 交互要点（对齐 PRD）
 
-- 登录：居中简约；LOGO 使用 `UtensilsCrossed`（lucide）。
+- 登录：居中简约；LOGO 使用站标 `/logo.ico`。
 - 点菜：仅展示**本人**菜单；左右分类滚动联动；详情弹层。
 - 我的：点菜记录、**分类管理**、**我的菜单**、**用户管理（仅 admin）**、切换账号。
 - 图标：lucide-react，见 [icons.md](./icons.md)。
+- PWA：生产构建后安装到主屏幕；二次打开走 SW 缓存，弱网可进壳层与已访问页。
 
 ## 8. FAQ
 
 | 问题 | 建议 |
 |------|------|
 | 改菜后点菜页仍旧？ | 确认写操作 `revalidateTag(menu:{userId})`；或点刷新 |
+| 开发时改代码不生效？ | 开发环境不注册 SW；若曾开过 `next start`，可在浏览器清站点数据 |
+| 主屏幕图标仍旧？ | 删掉主屏幕图标后重新「添加到主屏幕」；确认 `public/icons` 已同步 |
 | 切换账号后仍看到旧菜？ | 清购物车；菜单按用户分键缓存，登录会失效标签 |
 | 上传失败？ | 检查 `IMG_BB_API_KEY`、文件大小/类型 |
 | 两个演示账号菜不一样？ | 预期：admin 与 user 种子菜单相互独立 |

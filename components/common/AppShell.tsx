@@ -17,7 +17,8 @@ export function AppShell({ children }: { children: React.ReactNode }) {
     pathname.startsWith("/manage") ||
     pathname.startsWith("/categories") ||
     pathname.startsWith("/orders") ||
-    pathname.startsWith("/users");
+    pathname.startsWith("/users") ||
+    pathname.startsWith("/~offline");
   const isOrderPage = pathname === "/";
 
   return (

@@ -38,3 +38,8 @@ next-env.d.ts
 
 # vercel
 .vercel
+
+# serwist (webpack 产物；turbopack 走 /serwist 路由，保留以免混用)
+public/sw.js
+public/sw.js.map
+public/swe-worker*

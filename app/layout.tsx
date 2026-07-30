@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Manrope, ZCOOL_XiaoWei } from "next/font/google";
 import { AppShell } from "@/components/common/AppShell";
+import { PwaProvider } from "@/components/common/PwaProvider";
 import {
   APP_DESCRIPTION,
   APP_DISPLAY_NAME,
@@ -24,15 +25,23 @@ export const metadata: Metadata = {
   title: APP_DISPLAY_NAME,
   description: APP_DESCRIPTION,
   applicationName: APP_SHORT_NAME,
-  /** favicon / PWA / iOS 主屏幕均使用 logo.ico（发布路径 `/logo.ico`） */
+  manifest: "/manifest.webmanifest",
+  /** favicon 用 logo.ico；主屏幕 / 安装用 PNG */
   icons: {
-    icon: [{ url: APP_ICON_PATH, type: "image/x-icon", sizes: "any" }],
-    apple: [{ url: APP_ICON_PATH, type: "image/x-icon", sizes: "180x180" }],
+    icon: [
+      { url: APP_ICON_PATH, type: "image/x-icon", sizes: "any" },
+      { url: "/icons/icon-192.png", type: "image/png", sizes: "192x192" },
+      { url: "/icons/icon-512.png", type: "image/png", sizes: "512x512" },
+    ],
+    apple: [{ url: "/icons/icon-192.png", type: "image/png", sizes: "192x192" }],
   },
   appleWebApp: {
     capable: true,
     title: APP_DISPLAY_NAME,
     statusBarStyle: "default",
+  },
+  formatDetection: {
+    telephone: false,
   },
 };
 
@@ -53,7 +62,9 @@ export default function RootLayout({
   return (
     <html lang="zh-CN">
       <body className={`${sans.variable} ${display.variable} antialiased`}>
-        <AppShell>{children}</AppShell>
+        <PwaProvider>
+          <AppShell>{children}</AppShell>
+        </PwaProvider>
       </body>
     </html>
   );
