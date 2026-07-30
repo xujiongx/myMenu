@@ -50,8 +50,8 @@ export function LoginForm() {
   return (
     <div className="flex min-h-dvh flex-col px-6 pb-10 pt-16">
       <div className="mb-10 flex flex-col items-center text-center">
-        <div className="mb-4 overflow-hidden rounded-full bg-brand shadow-[0_10px_30px_rgba(240,180,41,0.45)]">
-          <AppLogo size={80} className="rounded-full" />
+        <div className="mb-4 drop-shadow-[0_10px_24px_rgba(255,140,0,0.35)]">
+          <AppLogo size={88} />
         </div>
         <h1 className="font-display text-3xl tracking-wide text-foreground">
           {APP_DISPLAY_NAME}

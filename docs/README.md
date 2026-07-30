@@ -2,7 +2,7 @@
 
 本目录为**小菜单**（移动端点菜 · Next.js + Supabase + ImgBB）的中文项目文档，与根目录 [README.md](../README.md)（快速上手）配合使用。
 
-**当前能力摘要**：账号密码登录；**每人独立菜单**（分类/菜品/订单按 `user_id` 隔离）；点菜结算、订单记录、自助菜品管理与 ImgBB 上传；lucide-react 图标；菜单缓存标签 `menu:{userId}`；品牌名 **小菜单**，站标 `/logo.ico`（favicon / 主屏幕 / PWA）。
+**当前能力摘要**：账号密码登录；**每人独立菜单**（分类/菜品/订单按 `user_id` 隔离）；点菜结算、订单记录、自助菜品管理与 ImgBB 上传；lucide-react 图标；菜单缓存标签 `menu:{userId}`；品牌名 **小菜单**，站标为笑脸餐盘 `/logo.ico`（favicon / 主屏幕 / PWA）。
 
 | 文档 | 说明 |
 |------|------|
