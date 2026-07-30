@@ -15,6 +15,7 @@
 | 分类 CRUD（仅本人） | `app/actions/category.ts` |
 | 下单 / 订单（仅本人） | `app/actions/order.ts` |
 | 图片上传 | `app/api/upload/route.ts`（任意登录用户） |
+| 健康检查 | `app/api/health/route.ts`（Bearer `HEALTH_CHECK_SECRET`） |
 
 ## 2. 菜单
 
@@ -46,3 +47,4 @@
 | 2026-07-28 | 按 user_id 隔离菜单 |
 | 2026-07-28 | 新增分类管理 CRUD |
 | 2026-07-28 | 管理员用户管理 CRUD（保护 admin） |
+| 2026-07-30 | `/api/health` + GitHub Actions keep-alive |

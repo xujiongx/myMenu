@@ -55,6 +55,7 @@ flowchart LR
 │   │   ├── category.ts           # 分类 CRUD（本人）
 │   │   └── user-admin.ts         # 用户 CRUD（仅 admin）
 │   ├── api/upload/route.ts       # ImgBB 上传
+│   ├── api/health/route.ts       # 健康检查 / Supabase 保活
 │   ├── login/page.tsx
 │   ├── page.tsx                  # 点菜 Tab
 │   ├── mine/page.tsx             # 我的 Tab
@@ -91,6 +92,7 @@ flowchart LR
 | `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` 或 `NEXT_PUBLIC_SUPABASE_ANON_KEY` | 是 | 浏览器 / SSR 匿名可发布密钥（以控制台为准） |
 | `SUPABASE_SERVICE_ROLE_KEY` | 是（服务端写推荐） | **仅服务端**，禁止 `NEXT_PUBLIC_` |
 | `IMG_BB_API_KEY` | 是（管理上传） | **仅服务端**，ImgBB |
+| `HEALTH_CHECK_SECRET` | 建议（保活） | `/api/health` Bearer；与 GitHub Actions 同值 |
 
 勿将 Service Role、ImgBB Key 提交 Git。
 

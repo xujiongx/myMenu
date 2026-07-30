@@ -37,6 +37,7 @@ flowchart TB
 | `SUPABASE_SERVICE_ROLE_KEY` | 是 | **仅服务端**，业务读写必填 |
 | `SESSION_SECRET` | 建议 | JWT 会话签名 |
 | `IMG_BB_API_KEY` | 是（启用上传） | **仅服务端** |
+| `HEALTH_CHECK_SECRET` | 建议（保活） | `/api/health` Bearer 鉴权；与 GitHub Actions Secret 同值 |
 
 **密钥管理**：Service Role、ImgBB Key 只放部署平台密钥区；**禁止** `NEXT_PUBLIC_` 前缀。参考根目录 [.env.example](../.env.example)。
 
@@ -81,13 +82,38 @@ flowchart TB
 | 非本人菜品 / 订单 | 不可见、不可改 |
 | 上传接口未登录 | 401 |
 
-## 8. 监控与日志（建议）
+## 8. 健康检查与 Supabase 保活
+
+### 8.1 `/api/health` 接口
+
+`GET /api/health` 仅供内部调用：向 Supabase 发一条轻量查询（`SELECT id FROM profiles LIMIT 1`），用于验证连通性，并**防止免费项目因 30 天不活跃被暂停**。
+
+鉴权：请求头须带 `Authorization: Bearer <HEALTH_CHECK_SECRET>`。未配置该变量时返回 503。
+
+### 8.2 GitHub Actions 定时保活
+
+`.github/workflows/keep-alive.yml` 在每月 1 日和 21 日（UTC 02:00）自动调用 `/api/health`。
+
+**配置步骤：**
+
+1. GitHub 仓库 → Settings → Secrets and variables → Actions 新增：
+
+   | Secret 名称 | 值 |
+   |-------------|-----|
+   | `HEALTH_CHECK_URL` | `https://你的域名/api/health` |
+   | `HEALTH_CHECK_SECRET` | 与部署平台 `HEALTH_CHECK_SECRET` 相同 |
+
+2. 在 Vercel（或其他平台）环境变量中配置同名 `HEALTH_CHECK_SECRET`。
+3. 可在 Actions → Keep Supabase Alive → Run workflow 手动验证。
+
+## 9. 监控与日志（建议）
 
 - 平台函数日志关注：登录失败率、上传 5xx、下单失败。
 - ImgBB 限额与失败需有可读错误，避免前端无限重试。
 
-## 9. 变更记录
+## 10. 变更记录
 
 | 日期 | 说明 |
 |------|------|
 | 2026-07-28 | 初版：Vercel + Supabase + ImgBB |
+| 2026-07-30 | 增加 `/api/health` 与 keep-alive Workflow |

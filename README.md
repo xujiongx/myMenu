@@ -31,6 +31,7 @@ UI 风格对齐 `docs` 设计图：黄色品牌色、餐罩 LOGO、左右分类�
 | `SUPABASE_SERVICE_ROLE_KEY` | **必填**，仅服务端；Settings → API |
 | `SESSION_SECRET` | 会话签名（建议随机长串） |
 | `IMG_BB_API_KEY` | 菜品图上传 |
+| `HEALTH_CHECK_SECRET` | 可选；`/api/health` 保活鉴权 |
 
 ### 3. 安装与启动
 
@@ -58,12 +59,15 @@ npm run dev
 | `/categories/form` | 新增/编辑分类 |
 | `/users` | 用户管理（仅 admin） |
 | `/users/form` | 新增/编辑用户（仅 admin） |
+| `/api/health` | Supabase 保活健康检查（Bearer） |
 
 ### 数据库
 
 - 新库：执行 `supabase/migrations/001_init.sql`
 - 已跑过旧版全局菜单：再执行 `002_per_user_menu.sql`
 - 已有库且 admin 角色为 user：再执行 `003_admin_role.sql`
+
+生产部署后可配置 `.github/workflows/keep-alive.yml`（见 [部署文档](./docs/deployment.md) §8）。
 
 ## 文档
 
